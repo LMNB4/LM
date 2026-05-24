@@ -1,0 +1,2716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>FK PREMIUM PLATFORM Pro Max</title>
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js">
+    </script>
+    <style>
+        :root {
+            --ios-bg: #000000;
+            --ios-card: #1c1c1e;
+            --ios-card-secondary: #2c2c2e;
+            --ios-label: #ffffff;
+            --ios-secondary-label: #8e8e93;
+            --ios-tertiary-label: #48484a;
+            --ios-blue: #0a84ff;
+            --ios-gold: #ffd60a;
+            --ios-green: #30d158;
+            --ios-purple: #bf5af2;
+            --ios-border: rgba(255, 255, 255, 0.08);
+            --ios-border-glow: rgba(255, 255, 255, 0.14);
+            --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "PingFang SC", sans-serif;
+            --font-mono: "SF Mono", "SF Pro Mono", Menlo, monospace;
+            --card-radius: 16px;
+            --btn-radius: 12px;
+            --transition-smooth: cubic-bezier(0.22, 0.61, 0.36, 1);
+            --transition-bounce: cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --particle-density: 1;
+            --bg-glow-strength: 0.18;
+            --scanline-opacity: 0.015;
+            --mouse-influence-radius: 160;
+            --particle-speed-mul: 1;
+            --fault-intensity: 1;
+            --ui-accent: #0a84ff;
+            --ui-accent-secondary: #bf5af2;
+        }
+        :not(input, textarea) {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--ios-bg);
+            color: var(--ios-label);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            line-height: 1.4;
+            position: relative;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 20%, rgba(10, 132, 255, .08), transparent 30%), radial-gradient(circle at 80% 0%, rgba(191, 90, 242, .08), transparent 25%), radial-gradient(circle at 50% 100%, rgba(255, 214, 10, .05), transparent 35%);
+            pointer-events: none;
+            z-index: 0;
+            animation: globalShift 16s ease-in-out infinite alternate;
+        }
+        @keyframes globalShift {
+            0%,
+            100% {
+                transform: scale(1) translate3d(0, 0, 0);
+            }
+            50% {
+                transform: scale(1.08) translate3d(0, -10px, 0);
+            }
+        }
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.65;
+        }
+        .ambient-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: var(--bg-glow-strength);
+            will-change: transform;
+            animation: orbDrift 18s ease-in-out infinite;
+        }
+        .ambient-orb.orb-1 {
+            width: 320px;
+            height: 320px;
+            background: radial-gradient(circle, rgba(var(--ui-accent-r, 10), var(--ui-accent-g, 132), var(--ui-accent-b, 255), 0.7) 0%, transparent 70%);
+            top: -8%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+        .ambient-orb.orb-2 {
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(var(--ui-accent2-r, 191), var(--ui-accent2-g, 90), var(--ui-accent2-b, 242), 0.6) 0%, transparent 70%);
+            bottom: -6%;
+            right: -8%;
+            animation-delay: -7s;
+            animation-duration: 22s;
+        }
+        .ambient-orb.orb-3 {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255, 214, 10, 0.45) 0%, transparent 70%);
+            top: 50%;
+            left: 55%;
+            animation-delay: -12s;
+            animation-duration: 20s;
+        }
+        @keyframes orbDrift {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            25% {
+                transform: translate(60px, -40px) scale(1.15);
+            }
+            50% {
+                transform: translate(-30px, 50px) scale(0.9);
+            }
+            75% {
+                transform: translate(-50px, -30px) scale(1.08);
+            }
+        }
+        .floating-cursor-glow {
+            position: fixed;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(var(--ui-accent-r, 10), var(--ui-accent-g, 132), var(--ui-accent-b, 255), 0.16), transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+            mix-blend-mode: screen;
+            transform: translate(-50%, -50%);
+            filter: blur(18px);
+            will-change: left, top;
+            transition: opacity 0.4s;
+        }
+        .ios-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            transition: opacity 0.5s ease;
+        }
+        .ios-spinner {
+            width: 28px;
+            height: 28px;
+            border: 2.5px solid rgba(255, 255, 255, 0.12);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        .ios-loader-label {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 1.5px;
+            font-family: var(--font-mono);
+            animation: loaderPulse 1.6s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        @keyframes loaderPulse {
+            0%,
+            100% {
+                opacity: 0.35;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+        .ios-sheet {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            z-index: 9999;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s var(--transition-bounce);
+        }
+        .ios-sheet.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .ios-sheet-card {
+            background: var(--ios-card);
+            width: 100%;
+            max-width: 540px;
+            border-radius: 22px 22px 0 0;
+            padding: 32px 24px calc(34px + env(safe-area-inset-bottom));
+            transform: translateY(100%);
+            transition: transform 0.55s var(--transition-bounce);
+            border-top: 1px solid var(--ios-border-glow);
+            box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.5);
+        }
+        .ios-sheet.active .ios-sheet-card {
+            transform: translateY(0);
+        }
+        .ios-sheet-title {
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+        }
+        .ios-sheet-body {
+            max-height: 35vh;
+            overflow-y: auto;
+            font-size: 14px;
+            color: var(--ios-secondary-label);
+            line-height: 1.6;
+            margin-bottom: 24px;
+            text-align: justify;
+            -webkit-overflow-scrolling: touch;
+        }
+        .ios-sheet-body p {
+            margin-bottom: 12px;
+        }
+        .ios-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: var(--btn-radius);
+            border: none;
+            cursor: pointer;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            transition: all 0.2s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        .ios-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.25) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        .ios-btn:active::after {
+            opacity: 1;
+        }
+        .ios-btn-primary {
+            background: var(--ui-accent);
+            color: #fff;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 18px rgba(10, 132, 255, 0.3);
+        }
+        .ios-btn-primary:active {
+            box-shadow: 0 2px 8px rgba(10, 132, 255, 0.5);
+            transform: scale(0.97);
+        }
+        .ios-btn-secondary {
+            background: transparent;
+            color: var(--ui-accent);
+        }
+        .ios-btn-secondary:active {
+            background: rgba(10, 132, 255, 0.08);
+            transform: scale(0.97);
+        }
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: rgba(0, 0, 0, 0.72);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 0.5px solid var(--ios-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 12px;
+            padding-top: env(safe-area-inset-top);
+            z-index: 900;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .ios-logo {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.5px;
+            white-space: nowrap;
+        }
+        .ios-logo span {
+            color: var(--ios-gold);
+            text-shadow: 0 0 18px rgba(255, 214, 10, 0.5);
+        }
+        .ios-segmented-control {
+            display: flex;
+            background: rgba(118, 118, 128, 0.22);
+            padding: 2px;
+            border-radius: 9px;
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+            height: 34px;
+            overflow: hidden;
+        }
+        .segment-node {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            line-height: 30px;
+            transition: color 0.25s;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            padding: 0 2px;
+            letter-spacing: 0.2px;
+            will-change: transform;
+        }
+        .segment-node.active {
+            font-weight: 600;
+            color: #000;
+            transition: color 0.35s;
+        }
+        .segment-pill {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: calc(25% - 3px);
+            height: 30px;
+            background: #ffffff;
+            z-index: 2;
+            border-radius: 7px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.18), 0px 1px 2px rgba(0, 0, 0, 0.1);
+            transition: transform 0.35s var(--transition-spring);
+            will-change: transform;
+        }
+        .tg-icon-btn {
+            width: 34px;
+            height: 34px;
+            background: rgba(118, 118, 128, 0.16);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.25s;
+            cursor: pointer;
+            will-change: transform;
+        }
+        .tg-icon-btn:active {
+            background: rgba(118, 118, 128, 0.32);
+            transform: scale(0.9);
+        }
+        .tg-icon-btn svg {
+            width: 17px;
+            height: 17px;
+            fill: #fff;
+            transition: fill 0.25s;
+        }
+        .tg-icon-btn:active svg {
+            fill: #229ED9;
+        }
+        main {
+            margin-top: 80px;
+            padding: 0 16px 70px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+            z-index: 1;
+        }
+        .space-capsule {
+            display: none;
+            opacity: 0;
+            will-change: opacity, transform;
+        }
+        .space-capsule.active-space {
+            display: block;
+            opacity: 1;
+        }
+        .ios-widget-card {
+            background: var(--ios-card);
+            border: 0.5px solid var(--ios-border);
+            padding: 24px;
+            border-radius: var(--card-radius);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            transition: box-shadow 0.4s, border-color 0.4s, transform 0.35s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+        }
+        .ios-widget-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+            pointer-events: none;
+        }
+        .ios-widget-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, .35);
+            border-color: rgba(255, 255, 255, .14);
+        }
+        .widget-hdr {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .widget-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--ios-secondary-label);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .ios-list {
+            background: var(--ios-card-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .ios-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.04);
+            transition: background 0.2s;
+        }
+        .ios-item:last-child {
+            border-bottom: none;
+        }
+        .ios-item-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--ui-accent);
+            border-radius: 50%;
+            flex-shrink: 0;
+            box-shadow: 0 0 8px rgba(var(--ui-accent-r), var(--ui-accent-g), var(--ui-accent-b), 0.5);
+            animation: dotPulse 2.5s ease-in-out infinite;
+        }
+        .ios-item:nth-child(odd) .ios-item-dot {
+            animation-delay: -1.2s;
+        }
+        @keyframes dotPulse {
+            0%,
+            100% {
+                box-shadow: 0 0 8px rgba(var(--ui-accent-r), var(--ui-accent-g), var(--ui-accent-b), 0.5);
+            }
+            50% {
+                box-shadow: 0 0 16px rgba(var(--ui-accent-r), var(--ui-accent-g), var(--ui-accent-b), 0.9);
+            }
+        }
+        .ios-item-text {
+            font-size: 14px;
+            color: #fff;
+        }
+        .tag-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 14px;
+        }
+        .tag-bubble {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 5px 11px;
+            font-size: 11px;
+            color: var(--ios-secondary-label);
+            border-radius: 7px;
+            font-family: var(--font-mono);
+            border: 0.5px solid rgba(255, 255, 255, 0.06);
+            transition: all 0.3s;
+        }
+        .tag-bubble:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.15);
+            color: #fff;
+        }
+        .ios-prose {
+            font-size: 14px;
+            color: #d1d1d6;
+            line-height: 1.65;
+        }
+        .ios-prose p {
+            margin-bottom: 12px;
+            text-align: justify;
+        }
+        .ios-prose strong {
+            color: #fff;
+            font-weight: 600;
+        }
+        .ios-prose .alert-span {
+            color: var(--ios-gold);
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(255, 214, 10, 0.4);
+        }
+        .ios-code-monitor {
+            background: #000;
+            border-radius: 8px;
+            padding: 14px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--ios-green);
+            height: 120px;
+            overflow: hidden;
+            margin-top: 14px;
+            border: 0.5px solid var(--ios-border);
+            position: relative;
+        }
+        .ios-code-monitor::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            pointer-events: none;
+            z-index: 2;
+        }
+        .code-rail {
+            animation: codeScroll 15s linear infinite;
+        }
+        @keyframes codeScroll {
+            0% {
+                transform: translateY(0);
+            }
+            100% {
+                transform: translateY(-50%);
+            }
+        }
+        .ios-status-bar {
+            background: var(--ios-card-secondary);
+            padding: 16px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+        }
+        .track-rail {
+            width: 100%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            border-radius: 2px;
+            margin-top: 4px;
+        }
+        .track-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--ui-accent), var(--ui-accent-secondary), #fff);
+            transition: width 3s ease-in-out;
+            border-radius: 2px;
+            box-shadow: 0 0 8px rgba(var(--ui-accent-r), var(--ui-accent-g), var(--ui-accent-b), 0.5);
+        }
+        .ios-action-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .ios-cell-btn {
+            background: var(--ui-accent);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 500;
+            text-align: center;
+            padding: 14px;
+            border-radius: var(--btn-radius);
+            text-decoration: none;
+            transition: all 0.25s var(--transition-smooth);
+            border: none;
+            cursor: pointer;
+            display: block;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(var(--ui-accent-r), var(--ui-accent-g), var(--ui-accent-b), 0.25);
+            will-change: transform;
+        }
+        .ios-cell-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -120%;
+            width: 70%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .3), transparent);
+            transform: skewX(-20deg);
+            transition: left .8s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .ios-cell-btn:hover::before {
+            left: 160%;
+        }
+        .ios-cell-btn:active {
+            opacity: 0.85;
+            transform: scale(0.96);
+            box-shadow: 0 2px 8px rgba(var(--ui-accent-r), var(--ui-accent-g), var(--ui-accent-b), 0.4);
+        }
+        .ios-cell-btn.btn-outline {
+            background: var(--ios-card-secondary);
+            color: var(--ui-accent);
+            border: 0.5px solid var(--ios-border);
+            box-shadow: none;
+        }
+        .ios-cell-btn.btn-outline:active {
+            background: rgba(var(--ui-accent-r), var(--ui-accent-g), var(--ui-accent-b), 0.08);
+        }
+        .ios-cell-btn.btn-unbind {
+            background: #ff453a;
+            color: #fff;
+            font-weight: 600;
+            margin-top: 8px;
+            display: inline-block;
+            width: 100%;
+            box-shadow: 0 4px 16px rgba(255, 69, 58, 0.25);
+        }
+        .ios-sub-caption {
+            text-align: center;
+            font-size: 12px;
+            color: var(--ios-secondary-label);
+            cursor: pointer;
+            margin-top: 6px;
+            transition: color 0.2s;
+        }
+        .ios-marquee-box {
+            background: var(--ios-card-secondary);
+            border-radius: 8px;
+            height: 36px;
+            overflow: hidden;
+            margin-top: 16px;
+            padding: 0 12px;
+        }
+        .marquee-inner {
+            animation: marqueeMove 9s infinite ease-in-out;
+        }
+        .marquee-unit {
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            font-family: var(--font-mono);
+            color: var(--ios-secondary-label);
+        }
+        @keyframes marqueeMove {
+            0%,
+            25% {
+                transform: translateY(0);
+            }
+            30%,
+            55% {
+                transform: translateY(-36px);
+            }
+            60%,
+            85% {
+                transform: translateY(-72px);
+            }
+            90%,
+            100% {
+                transform: translateY(0);
+            }
+        }
+        .ios-disclosure-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .ios-disclosure {
+            background: var(--ios-card-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: box-shadow 0.3s;
+        }
+        .disclosure-head {
+            padding: 14px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #fff;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .disclosure-head::after {
+            content: '➔';
+            font-size: 12px;
+            color: var(--ios-secondary-label);
+            transition: transform 0.35s var(--transition-spring), color 0.3s;
+            transform: rotate(90deg);
+            display: inline-block;
+        }
+        .disclosure-body {
+            max-height: 0;
+            padding: 0 16px;
+            font-size: 13px;
+            color: var(--ios-secondary-label);
+            overflow: hidden;
+            transition: all 0.4s var(--transition-bounce);
+            line-height: 1.55;
+            white-space: pre-line;
+        }
+        .ios-disclosure.expanded .disclosure-head::after {
+            transform: rotate(-90deg);
+            color: #fff;
+        }
+        .ios-disclosure.expanded .disclosure-body {
+            max-height: 220px;
+            padding-bottom: 14px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .mp-selector-matrix {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            background: var(--ios-card-secondary);
+            padding: 4px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            width: 100%;
+            gap: 4px;
+        }
+        .mp-tab-item {
+            text-align: center;
+            padding: 9px 0;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--ios-secondary-label);
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            will-change: transform;
+        }
+        .mp-tab-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        .mp-container-wrapper {
+            width: 100%;
+            height: 340px;
+            background: #000;
+            border-radius: 14px;
+            border: 1px solid var(--ios-border);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.4);
+            touch-action: none;
+        }
+        .mp-canvas-view {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        .mp-canvas-view.active-view {
+            display: block;
+        }
+        .mp-intro-mask {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(28, 28, 30, 0.94);
+            border-top: 0.5px solid var(--ios-border);
+            padding: 12px 16px;
+            font-size: 12px;
+            color: var(--ios-secondary-label);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .mp-start-btn {
+            background: var(--ios-green);
+            color: #000;
+            font-weight: 700;
+            padding: 7px 16px;
+            border-radius: 16px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.25s;
+            border: none;
+            box-shadow: 0 3px 12px rgba(48, 209, 88, 0.3);
+        }
+        .mp-start-btn:active {
+            transform: scale(0.92);
+            box-shadow: 0 1px 6px rgba(48, 209, 88, 0.5);
+        }
+        .mp-gesture-hint {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.3);
+            font-family: var(--font-mono);
+            pointer-events: none;
+            display: none;
+            z-index: 8;
+            letter-spacing: 0.5px;
+            animation: hintFade 2s ease-in-out infinite;
+        }
+        @keyframes hintFade {
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+        .vpad {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            gap: 4px;
+            z-index: 15;
+            flex-direction: column;
+            align-items: center;
+            touch-action: manipulation;
+            pointer-events: auto;
+        }
+        .vpad-row {
+            display: flex;
+            gap: 4px;
+        }
+        .vpad-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.09);
+            border: 0.5px solid rgba(255, 255, 255, 0.18);
+            border-radius: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            transition: background 0.15s, transform 0.1s;
+            pointer-events: auto;
+        }
+        .vpad-btn:active {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(0.88);
+        }
+        .ios-toast {
+            position: fixed;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(44, 44, 46, 0.95);
+            color: #fff;
+            padding: 11px 26px;
+            font-size: 13px;
+            font-weight: 500;
+            border-radius: 22px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            z-index: 99999;
+            transition: top 0.45s var(--transition-spring);
+            border: 0.5px solid var(--ios-border);
+            text-align: center;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            white-space: nowrap;
+            letter-spacing: 0.3px;
+        }
+        .ios-toast.show {
+            top: max(20px, env(safe-area-inset-top, 20px));
+        }
+        footer {
+            padding: 40px 16px;
+            padding-bottom: calc(40px + env(safe-area-inset-bottom));
+            text-align: center;
+            color: var(--ios-tertiary-label);
+            font-size: 11px;
+            font-family: var(--font-mono);
+            position: relative;
+            z-index: 1;
+            letter-spacing: 0.3px;
+        }
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(0);
+            animation: ripple 0.6s ease-out forwards;
+            pointer-events: none;
+            z-index: 5;
+        }
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.06);
+            gap: 12px;
+        }
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+        .setting-label {
+            font-size: 14px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .setting-desc {
+            font-size: 11px;
+            color: var(--ios-secondary-label);
+            margin-top: 2px;
+        }
+        .setting-slider {
+            -webkit-appearance: none;
+            width: 100px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.15);
+            outline: none;
+        }
+        .setting-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+        .setting-toggle {
+            width: 48px;
+            height: 28px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+            flex-shrink: 0;
+        }
+        .setting-toggle.on {
+            background: var(--ios-green);
+        }
+        .setting-toggle::after {
+            content: '';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #fff;
+            transition: left 0.3s var(--transition-spring);
+        }
+        .setting-toggle.on::after {
+            left: 23px;
+        }
+        .color-preset-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .color-preset-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .color-preset-dot.active {
+            border-color: #fff;
+            box-shadow: 0 0 16px currentColor;
+            transform: scale(1.1);
+        }
+        @media (max-width: 380px) {
+            .mp-selector-matrix {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 2px;
+                padding: 3px;
+            }
+            .mp-tab-item {
+                font-size: 9px;
+                padding: 6px 0;
+            }
+            .ios-widget-card {
+                padding: 18px 14px;
+                border-radius: 12px;
+            }
+            .segment-node {
+                font-size: 9px;
+                padding: 0 1px;
+            }
+            .ios-logo {
+                font-size: 12px;
+            }
+            .mp-container-wrapper {
+                height: 300px;
+            }
+            .vpad-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 14px;
+            }
+            .vpad {
+                bottom: 4px;
+                gap: 2px;
+            }
+            .vpad-row {
+                gap: 2px;
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation: none !important;
+                transition: none !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+    <div class="ambient-orb orb-3"></div>
+    <div class="ios-toast" id="iosToast"></div>
+    <div class="ios-loader" id="iosLoader">
+        <div class="ios-spinner"></div>
+        <div class="ios-loader-label">LOADING</div>
+    </div>
+    <div class="ios-sheet" id="safetySheet">
+        <div class="ios-sheet-card">
+            <div class="ios-sheet-title" id="txt-mTitle"></div>
+            <div class="ios-sheet-body" id="txt-mBody"></div>
+            <button class="ios-btn ios-btn-primary" onclick="confirmSafety()"></button>
+            <button class="ios-btn ios-btn-secondary" onclick="rejectSafety()"></button>
+        </div>
+    </div>
+    <div id="appShell" style="display:none;">
+        <header>
+            <div class="header-left"><div class="ios-logo" id="txt-logo"></div></div>
+            <div class="ios-segmented-control">
+                <div class="segment-pill" id="segPill"></div>
+                <button class="segment-node active" id="tab-core" onclick="switchSpace('core',0)"></button>
+                <button class="segment-node" id="tab-arcade" onclick="switchSpace('arcade',1)"></button>
+                <button class="segment-node" id="tab-telegram" onclick="switchSpace('telegram',2)"></button>
+                <button class="segment-node" id="tab-settings" onclick="switchSpace('settings',3)"></button>
+            </div>
+            <a href="https://t.me/LMNB4" target="_blank" class="tg-icon-btn" aria-label="Telegram">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-1-.65-.35-1 .22-1.62.15-.15 2.7-2.46 2.75-2.67.01-.03.01-.15-.06-.21-.07-.06-.17-.04-.25-.02-.11.02-1.83 1.16-5.16 3.41-.49.33-.93.5-1.33.49-.44-.01-1.29-.25-1.92-.45-.77-.25-1.39-.39-1.34-.83.03-.23.35-.46.97-.71 3.82-1.66 6.37-2.75 7.64-3.28 3.65-1.48 4.41-1.74 4.9-.15.02.04.03.09.03.14z"/></svg>
+            </a>
+        </header>
+        <main>
+            <div id="space-core" class="space-capsule active-space">
+                <section class="ios-widget-card">
+                    <div class="widget-hdr"><div class="widget-title" id="txt-c1Title"></div></div>
+                    <div class="ios-list" id="txt-features"></div>
+                    <div class="tag-row" id="txt-tags"></div>
+                </section>
+                <section class="ios-widget-card">
+                    <div class="widget-hdr"><div class="widget-title" id="txt-c2Title"></div></div>
+                    <div class="ios-prose" id="txt-proseBlock"></div>
+                    <div class="ios-code-monitor"><div class="code-rail" id="codeContainer"></div></div>
+                </section>
+                <section class="ios-widget-card">
+                    <div class="widget-hdr"><div class="widget-title" id="txt-c3Title"></div></div>
+                    <div class="ios-status-bar">
+                        <span id="stDevice">ENVIRONMENT CAPTURING...</span>
+                        <span id="stPercent" style="color:#fff;font-weight:600;">0%</span>
+                        <div class="track-rail"><div class="track-fill" id="stFill"></div></div>
+                    </div>
+                    <div class="ios-action-stack">
+                        <a href="https://wwbaj.lanzn.com/b0187z202h" target="_blank" class="ios-cell-btn" id="txt-btnDl"></a>
+                        <div class="ios-sub-caption" id="txt-copyPwd" onclick="doCopyPwd()"></div>
+                    </div>
+                </section>
+                <section class="ios-widget-card">
+                    <div class="widget-hdr"><div class="widget-title" id="txt-c4Title"></div><span id="txt-urgency" style="font-size:12px;color:var(--ios-gold);font-weight:600;"></span></div>
+                    <div class="ios-action-stack">
+                        <a href="https://shop.zmfaka.cn/shop/%E5%94%AF%E4%B8%80%E5%AE%98%E6%96%B9" target="_blank" class="ios-cell-btn btn-outline" id="txt-btnFaka"></a>
+                        <div class="ios-sub-caption" id="txt-copyFaka" onclick="doCopyFaka()"></div>
+                    </div>
+                    <div class="ios-marquee-box"><div class="marquee-inner" id="txt-marquee"></div></div>
+                </section>
+                <section class="ios-widget-card">
+                    <div class="widget-hdr"><div class="widget-title" id="txt-c5Title"></div></div>
+                    <div class="ios-disclosure-group" id="txt-faqs"></div>
+                </section>
+            </div>
+            <div id="space-arcade" class="space-capsule">
+                <section class="ios-widget-card" style="display:flex;flex-direction:column;align-items:center;">
+                    <div class="widget-hdr" style="width:100%;margin-bottom:12px;">
+                        <div class="widget-title">天天开心 Pro</div>
+                        <span style="font-size:11px;color:var(--ios-green);font-weight:600;">● MATRIX V3</span>
+                    </div>
+                    <div class="mp-selector-matrix" id="mpSelectorMatrix">
+                        <div class="mp-tab-item active" onclick="switchMiniProgram(0)">量子弹球</div>
+                        <div class="mp-tab-item" onclick="switchMiniProgram(1)">数字华容道</div>
+                        <div class="mp-tab-item" onclick="switchMiniProgram(2)">流光画板</div>
+                        <div class="mp-tab-item" onclick="switchMiniProgram(3)">开心消消乐</div>
+                        <div class="mp-tab-item" onclick="switchMiniProgram(4)">经典贪吃蛇</div>
+                        <div class="mp-tab-item" onclick="switchMiniProgram(5)">2048内核</div>
+                        <div class="mp-tab-item" onclick="switchMiniProgram(6)">霓虹俄罗斯方块</div>
+                        <div class="mp-tab-item" onclick="switchMiniProgram(7)">像素小鸟飞飞</div>
+                        <div class="mp-tab-item" onclick="switchMiniProgram(8)">赛博打砖块</div>
+                    </div>
+                    <div class="mp-container-wrapper" id="mpWrapper">
+                        <div class="mp-gesture-hint" id="mpGestureHint">SUPPORT GESTURE SWIPE</div>
+                        <canvas id="mpPinball" class="mp-canvas-view active-view" width="340" height="340"></canvas>
+                        <canvas id="mpSlidell" class="mp-canvas-view" width="340" height="340"></canvas>
+                        <canvas id="mpSketch" class="mp-canvas-view" width="340" height="340"></canvas>
+                        <canvas id="mpMatch3" class="mp-canvas-view" width="340" height="340"></canvas>
+                        <canvas id="mpSnake" class="mp-canvas-view" width="340" height="340"></canvas>
+                        <canvas id="mpMatrix2048" class="mp-canvas-view" width="340" height="340"></canvas>
+                        <canvas id="mpTetris" class="mp-canvas-view" width="340" height="340"></canvas>
+                        <canvas id="mpFlappy" class="mp-canvas-view" width="340" height="340"></canvas>
+                        <canvas id="mpBreakout" class="mp-canvas-view" width="340" height="340"></canvas>
+                        <div class="mp-intro-mask" id="mpMask">
+                            <span id="mpMaskDesc">项目：量子弹球已就绪</span>
+                            <div class="mp-start-btn" onclick="bootMiniApp()">开启应用</div>
+                        </div>
+                        <div class="vpad" id="vpad">
+                            <div class="vpad-row">
+                                <div class="vpad-btn" data-dir="up">▲</div>
+                            </div>
+                            <div class="vpad-row">
+                                <div class="vpad-btn" data-dir="left">◀</div>
+                                <div class="vpad-btn" data-dir="down">▼</div>
+                                <div class="vpad-btn" data-dir="right">▶</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div id="space-telegram" class="space-capsule">
+                <section class="ios-widget-card">
+                    <div class="widget-hdr"><div class="widget-title">TELEGRAM</div></div>
+                    <div class="ios-prose"><p>想获得更多信息请加入官方频道 目前未开通qq群聊 请注意分辨</p></div>
+                    <div class="ios-action-stack" style="margin-top:16px;"><a href="https://t.me/LMNB4" target="_blank" class="ios-cell-btn" style="background:#229ED9;">点击一键加入官方频道</a></div>
+                </section>
+            </div>
+            <div id="space-settings" class="space-capsule">
+                <section class="ios-widget-card">
+                    <div class="widget-hdr"><div class="widget-title">⚙️ 全局设置中心</div></div>
+                    <div class="setting-row"><div><div class="setting-label">粒子密度</div><div class="setting-desc">背景粒子数量</div></div><input type="range" class="setting-slider" id="setParticleDensity" min="0.3" max="2.5" step="0.1" value="1" oninput="updateSetting('particleDensity',this.value)"></div>
+                    <div class="setting-row"><div><div class="setting-label">粒子飘动速度</div><div class="setting-desc">动态流动的快慢</div></div><input type="range" class="setting-slider" id="setParticleSpeed" min="0.3" max="2" step="0.1" value="1" oninput="updateSetting('particleSpeed',this.value)"></div>
+                    <div class="setting-row"><div><div class="setting-label">鼠标互动半径</div><div class="setting-desc">光标影响粒子的范围</div></div><input type="range" class="setting-slider" id="setMouseRadius" min="80" max="300" step="10" value="160" oninput="updateSetting('mouseRadius',this.value)"></div>
+                    <div class="setting-row"><div><div class="setting-label">背景光晕强度</div><div class="setting-desc">环境光斑的可见度</div></div><input type="range" class="setting-slider" id="setGlowStrength" min="0.05" max="0.4" step="0.01" value="0.18" oninput="updateSetting('glowStrength',this.value)"></div>
+                    <div class="setting-row"><div><div class="setting-label">故障效果强度</div><div class="setting-desc">扫描线与画面撕裂</div></div><input type="range" class="setting-slider" id="setFaultIntensity" min="0" max="2" step="0.1" value="1" oninput="updateSetting('faultIntensity',this.value)"></div>
+                    <div class="setting-row"><div><div class="setting-label">扫描线故障效果</div><div class="setting-desc">开关故障艺术特效</div></div><div class="setting-toggle on" id="setScanlines" onclick="toggleSetting('scanlines')"></div></div>
+                    <div class="setting-row"><div><div class="setting-label">显示光标辉光</div><div class="setting-desc">跟随鼠标的光晕</div></div><div class="setting-toggle on" id="setCursorGlow" onclick="toggleSetting('cursorGlow')"></div></div>
+                    <div class="setting-row"><div><div class="setting-label">粒子颜色主题</div><div class="setting-desc">选择粒子渐变配色</div></div></div>
+                    <div class="color-preset-row" style="margin-bottom:10px;">
+                        <div class="color-preset-dot active" style="background:linear-gradient(135deg,#0a84ff,#bf5af2);color:#0a84ff;" onclick="selectColorPreset(0,this)"></div>
+                        <div class="color-preset-dot" style="background:linear-gradient(135deg,#ffd60a,#ff453a);color:#ffd60a;" onclick="selectColorPreset(1,this)"></div>
+                        <div class="color-preset-dot" style="background:linear-gradient(135deg,#30d158,#0a84ff);color:#30d158;" onclick="selectColorPreset(2,this)"></div>
+                        <div class="color-preset-dot" style="background:linear-gradient(135deg,#ff453a,#ffd60a);color:#ff453a;" onclick="selectColorPreset(3,this)"></div>
+                        <div class="color-preset-dot" style="background:linear-gradient(135deg,#bf5af2,#30d158);color:#bf5af2;" onclick="selectColorPreset(4,this)"></div>
+                        <div class="color-preset-dot" style="background:linear-gradient(135deg,#64d2ff,#ff9f0a);color:#64d2ff;" onclick="selectColorPreset(5,this)"></div>
+                    </div>
+                    <div class="setting-row"><div><div class="setting-label">UI 强调色</div><div class="setting-desc">按钮、高亮等主色调</div></div><input type="color" id="setAccentColor" value="#0a84ff" onchange="updateSetting('accentColor',this.value)"></div>
+                    <div class="setting-row"><div><div class="setting-label">全局游戏难度</div><div class="setting-desc">影响所有游戏的速度等</div></div><input type="range" class="setting-slider" id="setDifficulty" min="1" max="3" step="1" value="2" oninput="updateSetting('difficulty',this.value)"></div>
+                    <div class="setting-desc" style="text-align:center;margin-top:4px;" id="difficultyLabel">当前：普通 (适中)</div>
+                    <button class="ios-cell-btn btn-outline" style="margin-top:16px;" onclick="resetAllSettings()">恢复默认设置</button>
+                </section>
+            </div>
+        </main>
+        <footer><p>© 2026 FK 保存网址不易走丢 感谢您的支持</p></footer>
+    </div>
+    <script>
+        (function() {
+            const GLOBAL_I18N_ASSETS = {
+                logoText: "FUCK <span>高级产品</span>",
+                navTabCore: "介绍",
+                navTabArcade: "娱乐",
+                navTabTelegram: "电报",
+                navTabSettings: "设置",
+                toastClipboardSuccessPwd: "提取码已成功复制至剪贴板",
+                toastClipboardSuccessFaka: "官方直连网址已成功复制",
+                modalTitle: "使用说明",
+                modalParagraphs: [
+                    "1. 本工具仅为技术研究与学习交流使用，开发者明确禁止将其用于任何商业用途及游戏作弊行为，使用前请确保已获得相关游戏运营方的书面许可。",
+                    "2. 任何用户因使用本工具违反游戏用户协议、破坏游戏公平性，导致账号封禁、数据清零、法律追责等后果，均由用户自行承担，开发者不承担任何责任。",
+                    "3. 本工具可能存在兼容性问题或技术漏洞，使用过程中若导致设备故障、数据丢失、系统损坏等情况，开发者不承担维修、赔偿等责任，建议用户谨慎使用并做好数据备份。",
+                    "4. 开发者已明确告知使用本工具的潜在风险，用户下载、安装、使用本工具即视为完全知晓并自愿承担所有风险，与开发者无涉。"
+                ],
+                modalDeclineBtn: "拒绝并退出",
+                modalAcceptBtn: "同意并进入",
+                c1Title: "核心功能",
+                c1FeaturesList: ["无任何过检测 无需担心和谐", "独家驱动自隐藏全部痕迹", "独家断点解密和闪框解密", "Phys X 模型漏打不动内存", "内核级陀螺仪自瞄 (非系统)", "内核级硬件断点追踪 (无过检)",
+                    "多种功能自由调试", "多种绘图 功能全面"
+                ],
+                c1MetadataTags: ["一卡通用", "和平精英", "无畏契约", "PUBG"],
+                c2Title: "真假硬件断点？",
+                c2ProseParagraphs: ["还有人质疑是不是真断点？没什么好质疑的。就算我证明给你们看，你们也看不懂。", "我的驱动包都是完全公开出来的，真正有点技术的朋友，可以<strong>自行通过 IDA 反编译</strong>进行深度查看与逆向审计。",
+                    "还有一些神人说\"贵的东西才是真断点、才是真稳\"，这种人<span class='alert-span'>就是活该被圈</span>。", "传闻\"4系设备不支持断点\"的说法——那不是不支持，纯粹是别人技术不行，但不代表我不行！小米、红米等绝大部分4系设备都可以使用硬件断点技术。"
+                ],
+                c3Title: "法克网盘下载链接",
+                c3StatusLoading: "ENVIRONMENT CAPTURING...",
+                c3StatusComplete: "✓ HANDSHAKE SUCCESSFULLY ATTACHED.",
+                c3BtnDownload: "点击立即下载",
+                c3LabelCopyPwd: "网盘提取码：2bg5（点击一键复制载入剪贴板）",
+                c3ActualPwdRaw: "2bg5",
+                c4Title: "法克官方卡网",
+                c4UrgencyCount: "当前密匙剩余：9999 件",
+                c4BtnFaka: "我要购卡",
+                c4LabelCopyFaka: "一键复制官方卡网",
+                c4ActualFakaUrl: "https://shop.zmfaka.cn/shop/%E5%94%AF%E4%B8%80%E5%AE%98%E6%96%B9",
+                c4MarqueeItems: [{ text: "天卡", badge: "6元" }, { text: "周卡", badge: "35元" }, { text: "月卡", badge: "120元" }],
+                c5Title: "解答区",
+                c5FaqItems: [{ q: "为什么点初始化没效果？", a: "主页的初始化和绘制初始化都要点" }, { q: "输入卡密后显示Aborted?",
+                    a: "1、尝试重新执行\n2、把 /storage/emulated/0/Fuckcard.txt 这个文件删除后重启\n3、手动创建 /storage/emulated/0/Fuckcard.txt 文件，输入卡密后再执行\n4、校验北京时间（开启系统自动设置）\n5、若设备异常绑定请点击下方红色按钮自助解绑。"
+                }, { q: "卡密自助解绑查询链接", a: "http://147.135.51.221:81/unbind/?programId=1001" }]
+            };
+            const glow = document.createElement('div');
+            glow.className = 'floating-cursor-glow';
+            document.body.appendChild(glow);
+            let mouseX = -200,
+                mouseY = -200,
+                targetMouseX = -200,
+                targetMouseY = -200;
+            window.addEventListener('pointermove', (e) => { targetMouseX = e.clientX;
+                targetMouseY = e.clientY; }, { passive: true });
+
+            function updateGlow() { mouseX += (targetMouseX - mouseX) * 0.25;
+                mouseY += (targetMouseY - mouseY) * 0.25;
+                glow.style.left = mouseX + 'px';
+                glow.style.top = mouseY + 'px';
+                requestAnimationFrame(updateGlow); }
+            updateGlow();
+            document.addEventListener('click', function(e) {
+                const target = e.target.closest(
+                    'button, .ios-cell-btn, .mp-tab-item, .ios-sub-caption, .tg-icon-btn, .mp-start-btn');
+                if (!target) return;
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple-effect';
+                const rect = target.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                ripple.style.width = size + 'px';
+                ripple.style.height = size + 'px';
+                ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                const prevOverflow = target.style.overflow;
+                target.style.overflow = 'hidden';
+                target.appendChild(ripple);
+                setTimeout(() => { ripple.remove();
+                    target.style.overflow = prevOverflow || ''; }, 600);
+                if (navigator.vibrate && navigator.maxTouchPoints > 0) { try { navigator.vibrate(10); } catch (e) {} }
+            });
+            const observer = new IntersectionObserver((entries) => { entries.forEach(entry => { if (entry
+                    .isIntersecting) { entry.target.animate([{ opacity: 0, transform: 'translateY(28px) scale(.98)' }, {
+                            opacity: 1,
+                            transform: 'translateY(0) scale(1)' }], { duration: 700,
+                        easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' });
+                    observer.unobserve(entry.target); } }); }, { threshold: 0.08 });
+
+            function renderI18nView() {
+                const i = GLOBAL_I18N_ASSETS;
+                document.getElementById('txt-logo').innerHTML = i.logoText;
+                document.getElementById('tab-core').innerText = i.navTabCore;
+                document.getElementById('tab-arcade').innerText = i.navTabArcade;
+                document.getElementById('tab-telegram').innerText = i.navTabTelegram;
+                document.getElementById('tab-settings').innerText = i.navTabSettings;
+                document.getElementById('txt-mTitle').innerText = i.modalTitle;
+                document.getElementById('txt-mBody').innerHTML = i.modalParagraphs.map(p => `<p>${p}</p>`).join('');
+                document.querySelector('.ios-btn-secondary').innerText = i.modalDeclineBtn;
+                document.querySelector('.ios-btn-primary').innerText = i.modalAcceptBtn;
+                document.getElementById('txt-c1Title').innerText = i.c1Title;
+                document.getElementById('txt-features').innerHTML = i.c1FeaturesList.map(f =>
+                    `<div class="ios-item"><div class="ios-item-dot"></div><div class="ios-item-text">${f}</div></div>`).join(
+                    '');
+                document.getElementById('txt-tags').innerHTML = i.c1MetadataTags.map(t =>
+                    `<span class="tag-bubble">${t}</span>`).join('');
+                document.getElementById('txt-c2Title').innerText = i.c2Title;
+                document.getElementById('txt-proseBlock').innerHTML = i.c2ProseParagraphs.map(p => `<p>${p}</p>`).join('');
+                document.getElementById('txt-c3Title').innerText = i.c3Title;
+                document.getElementById('txt-btnDl').innerText = i.c3BtnDownload;
+                document.getElementById('txt-copyPwd').innerText = i.c3LabelCopyPwd;
+                document.getElementById('txt-c4Title').innerText = i.c4Title;
+                document.getElementById('txt-urgency').innerText = i.c4UrgencyCount;
+                document.getElementById('txt-btnFaka').innerText = i.c4BtnFaka;
+                document.getElementById('txt-copyFaka').innerText = i.c4LabelCopyFaka;
+                document.getElementById('txt-marquee').innerHTML = i.c4MarqueeItems.map(m =>
+                    `<div class="marquee-unit"><span>⚡ DATA ACTIVATION: PRODUCT MATCHED [${m.text}]</span><span style="color:var(--ios-gold);font-weight:600;">${m.badge}</span></div>`
+                    ).join('');
+                document.getElementById('txt-c5Title').innerText = i.c5Title;
+                let faqHtml = '';
+                i.c5FaqItems.forEach((f) => {
+                    if (f.q.includes("解绑")) faqHtml +=
+                        `<div class="ios-disclosure expanded"><div class="disclosure-head" style="color:#ff453a;">${f.q}</div><div class="disclosure-body" style="max-height:120px;padding-bottom:14px;"><button class="ios-cell-btn btn-unbind" onclick="window.open('${f.a}','_blank')">立即跳转</button></div></div>`;
+                    else faqHtml +=
+                        `<div class="ios-disclosure" onclick="this.classList.toggle('expanded')"><div class="disclosure-head">${f.q}</div><div class="disclosure-body">${f.a}</div></div>`;
+                });
+                document.getElementById('txt-faqs').innerHTML = faqHtml;
+            }
+
+            function doCopyPwd() { sendToClipboard(GLOBAL_I18N_ASSETS.c3ActualPwdRaw, GLOBAL_I18N_ASSETS
+                .toastClipboardSuccessPwd); }
+
+            function doCopyFaka() { sendToClipboard(GLOBAL_I18N_ASSETS.c4ActualFakaUrl, GLOBAL_I18N_ASSETS
+                .toastClipboardSuccessFaka); }
+
+            function sendToClipboard(text, msg) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const toast = document.getElementById('iosToast');
+                    toast.innerText = msg;
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 2000);
+                }).catch(() => {
+                    const toast = document.getElementById('iosToast');
+                    toast.innerText = '复制失败，请手动复制';
+                    toast.classList.add('show');
+                    setTimeout(() => toast.classList.remove('show'), 1800);
+                });
+            }
+            window.doCopyPwd = doCopyPwd;
+            window.doCopyFaka = doCopyFaka;
+            window.confirmSafety = function() {
+                document.getElementById('safetySheet').classList.remove('active');
+                document.getElementById('appShell').style.display = 'block';
+                gsap.from("header", { y: -50, opacity: 0, duration: 0.5, ease: "power3.out" });
+                gsap.from(".ios-widget-card", { y: 40, opacity: 0, stagger: 0.06, duration: 0.6, ease: "power2.out" });
+                setTimeout(() => {
+                    const fill = document.getElementById('stFill');
+                    const pct = document.getElementById('stPercent');
+                    if (!fill) return;
+                    fill.style.width = '100%';
+                    let p = 0;
+                    const t = setInterval(() => { p += Math.floor(Math.random() * 15) + 6; if (p >= 100) { p = 100;
+                            clearInterval(t);
+                            document.getElementById('stDevice').innerText = GLOBAL_I18N_ASSETS
+                            .c3StatusComplete; }
+                        pct.innerText = p + "%"; }, 80);
+                }, 300);
+                document.querySelectorAll('.ios-widget-card').forEach(card => observer.observe(card));
+                loadSettings();
+            };
+            window.rejectSafety = function() { window.location.href = 'about:blank'; };
+            window.addEventListener('DOMContentLoaded', () => {
+                renderI18nView();
+                initParticleBackground();
+                setTimeout(() => {
+                    const loader = document.getElementById('iosLoader');
+                    if (loader) { loader.style.opacity = '0';
+                        setTimeout(() => { loader.remove();
+                            document.getElementById('safetySheet').classList.add('active'); }, 400); }
+                }, 600);
+            });
+            const lns = new Lenis({ duration: 1.0, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+                smoothWheel: true, smoothTouch: false });
+
+            function frameLns(t) { lns.raf(t);
+                requestAnimationFrame(frameLns); }
+            requestAnimationFrame(frameLns);
+            window.switchSpace = function(spaceId, index) {
+                const pill = document.getElementById('segPill');
+                pill.style.transform = `translateX(calc(${index * 100}%))`;
+                document.querySelectorAll('.segment-node').forEach(n => n.classList.remove('active'));
+                if (spaceId === 'core') document.getElementById('tab-core').classList.add('active');
+                if (spaceId === 'arcade') document.getElementById('tab-arcade').classList.add('active');
+                if (spaceId === 'telegram') document.getElementById('tab-telegram').classList.add('active');
+                if (spaceId === 'settings') document.getElementById('tab-settings').classList.add('active');
+                const activeCap = document.querySelector('.space-capsule.active-space');
+                const targetCap = document.getElementById(`space-${spaceId}`);
+                if (activeCap === targetCap) return;
+                gsap.to(activeCap, { opacity: 0, y: -10, duration: 0.15, ease: "power2.in", onComplete: () => {
+                        activeCap.classList.remove('active-space');
+                        targetCap.classList.add('active-space');
+                        gsap.fromTo(targetCap, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35,
+                            ease: "power2.out" });
+                        if (spaceId === 'arcade') window.switchMiniProgram(0);
+                        if (spaceId === 'settings') refreshSettingsUI();
+                    } });
+            };
+            const asm = ["void __fastcall TraceHook(uintptr_t reg) {", "  if (reg & 0x3) {",
+                "    InjectHardwareBreakpoint(reg);", "  }", "}"
+            ];
+            const box = document.getElementById('codeContainer');
+            [...asm, ...asm, ...asm, ...asm].forEach(s => { const d = document.createElement('div');
+                d.innerText = s;
+                box.appendChild(d); });
+            let resizeTicking = false;
+            window.addEventListener('resize', () => { if (!resizeTicking) { resizeTicking = true;
+                    requestAnimationFrame(() => { document.documentElement.style.setProperty('--vh', window.innerHeight *
+                            0.01 + 'px');
+                        resizeTicking = false; }); } }, { passive: true });
+            document.addEventListener('visibilitychange', () => { document.body.style.filter = document.hidden ?
+                    'saturate(.92)' : 'saturate(1)'; });
+
+            // ===== 最高分工具函数 =====
+            function getBestScore(key) { try { return parseInt(localStorage.getItem(key)) || 0; } catch (e) { return 0; } }
+
+            function updateBestScore(key, score) { try { const best = getBestScore(key); if (score > best)
+                    localStorage.setItem(key, score); return Math.max(score, best); } catch (e) { return score; } }
+
+            // ===== 通用结算界面绘制 =====
+            function drawGameOverCard(ctx, W, H, gameName, score, bestKey) {
+                const best = updateBestScore(bestKey, score);
+                // 半透明蒙层
+                ctx.fillStyle = 'rgba(0,0,0,0.72)';
+                ctx.fillRect(0, 0, W, H);
+                // 居中卡片
+                const cardW = 220,
+                    cardH = 170,
+                    cardX = (W - cardW) / 2,
+                    cardY = (H - cardH) / 2;
+                // 卡片阴影
+                ctx.fillStyle = 'rgba(0,0,0,0.5)';
+                roundRect(ctx, cardX + 3, cardY + 3, cardW, cardH, 16);
+                ctx.fill();
+                // 卡片背景
+                const cardGrad = ctx.createLinearGradient(cardX, cardY, cardX, cardY + cardH);
+                cardGrad.addColorStop(0, '#2c2c2e');
+                cardGrad.addColorStop(1, '#1c1c1e');
+                ctx.fillStyle = cardGrad;
+                roundRect(ctx, cardX, cardY, cardW, cardH, 16);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+                ctx.lineWidth = 0.8;
+                roundRect(ctx, cardX, cardY, cardW, cardH, 16);
+                ctx.stroke();
+                // 游戏名
+                ctx.fillStyle = '#fff';
+                ctx.font = '700 16px -apple-system, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(gameName, W / 2, cardY + 28);
+                // 本次得分
+                ctx.fillStyle = '#ffd60a';
+                ctx.font = '700 32px -apple-system, sans-serif';
+                ctx.fillText(score, W / 2, cardY + 68);
+                ctx.fillStyle = 'rgba(255,255,255,0.6)';
+                ctx.font = '500 11px -apple-system, sans-serif';
+                ctx.fillText('本次得分', W / 2, cardY + 48);
+                // 历史最高分
+                ctx.fillStyle = 'rgba(255,255,255,0.55)';
+                ctx.font = '500 12px -apple-system, sans-serif';
+                ctx.fillText('历史最高: ' + best, W / 2, cardY + 98);
+                // 分隔线
+                ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.moveTo(cardX + 30, cardY + 112);
+                ctx.lineTo(cardX + cardW - 30, cardY + 112);
+                ctx.stroke();
+                // 重新开始提示
+                ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                ctx.font = '500 13px -apple-system, sans-serif';
+                ctx.fillText('点击画面重新开始', W / 2, cardY + 136);
+            }
+
+            // ===== 增强设置系统 =====
+            let appSettings = {
+                particleDensity: 1,
+                particleSpeed: 1,
+                mouseRadius: 160,
+                glowStrength: 0.18,
+                faultIntensity: 1,
+                scanlines: true,
+                cursorGlow: true,
+                colorPreset: 0,
+                accentColor: '#0a84ff',
+                difficulty: 2
+            };
+            const colorPresets = [
+                [{ r: 10, g: 132, b: 255 }, { r: 100, g: 80, b: 240 }, { r: 191, g: 90, b: 242 }],
+                [{ r: 255, g: 214, b: 10 }, { r: 255, g: 150, b: 30 }, { r: 255, g: 69, b: 58 }],
+                [{ r: 48, g: 209, b: 88 }, { r: 10, g: 200, b: 180 }, { r: 10, g: 132, b: 255 }],
+                [{ r: 255, g: 69, b: 58 }, { r: 255, g: 120, b: 40 }, { r: 255, g: 214, b: 10 }],
+                [{ r: 191, g: 90, b: 242 }, { r: 130, g: 60, b: 220 }, { r: 48, g: 209, b: 88 }],
+                [{ r: 100, g: 210, b: 255 }, { r: 200, g: 180, b: 80 }, { r: 255, g: 159, b: 10 }]
+            ];
+            let activeColorStops = colorPresets[0];
+            let particleDensityMultiplier = 1;
+            let particleSpeedMultiplier = 1;
+            let mouseInfluenceRadius = 160;
+            let bgGlowStrength = 0.18;
+            let faultIntensity = 1;
+            let scanlinesEnabled = true;
+            let cursorGlowEnabled = true;
+            let globalDifficulty = 2;
+            let uiAccentColor = '#0a84ff';
+
+            function hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } :
+                    { r: 10, g: 132, b: 255 };
+            }
+
+            function applyAccentColor() {
+                const rgb = hexToRgb(uiAccentColor);
+                document.documentElement.style.setProperty('--ui-accent', uiAccentColor);
+                document.documentElement.style.setProperty('--ui-accent-r', rgb.r);
+                document.documentElement.style.setProperty('--ui-accent-g', rgb.g);
+                document.documentElement.style.setProperty('--ui-accent-b', rgb.b);
+                document.documentElement.style.setProperty('--ui-accent-secondary', '#bf5af2');
+                document.documentElement.style.setProperty('--ui-accent2-r', 191);
+                document.documentElement.style.setProperty('--ui-accent2-g', 90);
+                document.documentElement.style.setProperty('--ui-accent2-b', 242);
+                const glowEl = document.querySelector('.floating-cursor-glow');
+                if (glowEl) glowEl.style.background =
+                    `radial-gradient(circle, rgba(${rgb.r},${rgb.g},${rgb.b},0.16), transparent 70%)`;
+                if (cursorGlowEnabled) glowEl.style.opacity = 1;
+                else glowEl.style.opacity = 0;
+            }
+
+            function loadSettings() {
+                try {
+                    const saved = localStorage.getItem('fk_premium_settings_v2');
+                    if (saved) { const parsed = JSON.parse(saved);
+                        Object.assign(appSettings, parsed); }
+                } catch (e) {}
+                applyAllSettings();
+                refreshSettingsUI();
+            }
+
+            function saveSettings() {
+                try { localStorage.setItem('fk_premium_settings_v2', JSON.stringify(appSettings)); } catch (e) {}
+            }
+
+            function applyAllSettings() {
+                particleDensityMultiplier = appSettings.particleDensity;
+                particleSpeedMultiplier = appSettings.particleSpeed;
+                mouseInfluenceRadius = appSettings.mouseRadius;
+                bgGlowStrength = appSettings.glowStrength;
+                faultIntensity = appSettings.faultIntensity;
+                scanlinesEnabled = appSettings.scanlines;
+                cursorGlowEnabled = appSettings.cursorGlow;
+                activeColorStops = colorPresets[appSettings.colorPreset] || colorPresets[0];
+                uiAccentColor = appSettings.accentColor;
+                globalDifficulty = appSettings.difficulty;
+                document.documentElement.style.setProperty('--bg-glow-strength', bgGlowStrength);
+                document.querySelectorAll('.ambient-orb').forEach(o => o.style.opacity = bgGlowStrength);
+                document.documentElement.style.setProperty('--mouse-influence-radius', mouseInfluenceRadius + 'px');
+                applyAccentColor();
+                const diffLabel = document.getElementById('difficultyLabel');
+                if (diffLabel) diffLabel.innerText = '当前：' + (['', '简单 (休闲)', '普通 (适中)', '困难 (挑战)'][globalDifficulty] ||
+                    '普通 (适中)');
+                saveSettings();
+                refreshSettingsUI();
+            }
+
+            function refreshSettingsUI() {
+                const els = {
+                    sd: document.getElementById('setParticleDensity'),
+                    sspeed: document.getElementById('setParticleSpeed'),
+                    smr: document.getElementById('setMouseRadius'),
+                    sg: document.getElementById('setGlowStrength'),
+                    sf: document.getElementById('setFaultIntensity'),
+                    sscan: document.getElementById('setScanlines'),
+                    scglow: document.getElementById('setCursorGlow'),
+                    saccent: document.getElementById('setAccentColor'),
+                    sdiff: document.getElementById('setDifficulty'),
+                    dl: document.getElementById('difficultyLabel')
+                };
+                if (els.sd) els.sd.value = appSettings.particleDensity;
+                if (els.sspeed) els.sspeed.value = appSettings.particleSpeed;
+                if (els.smr) els.smr.value = appSettings.mouseRadius;
+                if (els.sg) els.sg.value = appSettings.glowStrength;
+                if (els.sf) els.sf.value = appSettings.faultIntensity;
+                if (els.sscan) { if (appSettings.scanlines) els.sscan.classList.add('on');
+                    else els.sscan.classList.remove('on'); }
+                if (els.scglow) { if (appSettings.cursorGlow) els.scglow.classList.add('on');
+                    else els.scglow.classList.remove('on'); }
+                if (els.saccent) els.saccent.value = appSettings.accentColor;
+                if (els.sdiff) els.sdiff.value = appSettings.difficulty;
+                if (els.dl) els.dl.innerText = '当前：' + (['', '简单 (休闲)', '普通 (适中)', '困难 (挑战)'][appSettings.difficulty] ||
+                    '普通 (适中)');
+                document.querySelectorAll('.color-preset-dot').forEach((d, i) => d.classList.toggle('active', i ===
+                    appSettings.colorPreset));
+            }
+            window.updateSetting = function(key, value) {
+                if (key === 'particleDensity') appSettings.particleDensity = parseFloat(value);
+                if (key === 'particleSpeed') appSettings.particleSpeed = parseFloat(value);
+                if (key === 'mouseRadius') appSettings.mouseRadius = parseInt(value);
+                if (key === 'glowStrength') appSettings.glowStrength = parseFloat(value);
+                if (key === 'faultIntensity') appSettings.faultIntensity = parseFloat(value);
+                if (key === 'difficulty') appSettings.difficulty = Math.round(parseFloat(value));
+                if (key === 'accentColor') appSettings.accentColor = value;
+                applyAllSettings();
+            };
+            window.toggleSetting = function(key) {
+                if (key === 'scanlines') appSettings.scanlines = !appSettings.scanlines;
+                if (key === 'cursorGlow') appSettings.cursorGlow = !appSettings.cursorGlow;
+                applyAllSettings();
+            };
+            window.selectColorPreset = function(idx, el) {
+                appSettings.colorPreset = idx;
+                document.querySelectorAll('.color-preset-dot').forEach(d => d.classList.remove('active'));
+                if (el) el.classList.add('active');
+                applyAllSettings();
+            };
+            window.resetAllSettings = function() {
+                appSettings = { particleDensity: 1, particleSpeed: 1, mouseRadius: 160, glowStrength: 0.18,
+                    faultIntensity: 1, scanlines: true, cursorGlow: true, colorPreset: 0,
+                    accentColor: '#0a84ff', difficulty: 2 };
+                applyAllSettings();
+            };
+
+            // ===== 粒子背景系统 =====
+            function initParticleBackground() {
+                const canvas = document.getElementById('particleCanvas');
+                const ctx = canvas.getContext('2d');
+                let particles = [];
+                let canvasW, canvasH;
+
+                function resize() { canvasW = canvas.width = window.innerWidth;
+                    canvasH = canvas.height = window.innerHeight; }
+                resize();
+                window.addEventListener('resize', resize);
+                window.addEventListener('orientationchange', () => setTimeout(resize, 200));
+
+                function getColor(t) {
+                    t = Math.max(0, Math.min(1, t));
+                    const segCount = activeColorStops.length - 1;
+                    const seg = Math.min(Math.floor(t * segCount), segCount - 1);
+                    const localT = t * segCount - seg;
+                    const c1 = activeColorStops[seg];
+                    const c2 = activeColorStops[seg + 1];
+                    return { r: Math.round(c1.r + (c2.r - c1.r) * localT), g: Math.round(c1.g + (c2.g - c1.g) * localT),
+                        b: Math.round(c1.b + (c2.b - c1.b) * localT) };
+                }
+                class Particle {
+                    constructor() { this.reset(true); }
+                    reset(initial = false) {
+                        this.x = Math.random() * canvasW;
+                        this.y = initial ? Math.random() * canvasH : -15;
+                        this.baseSize = Math.random() * 2.2 + 0.5;
+                        this.size = this.baseSize;
+                        this.speedY = Math.random() * 0.4 + 0.1;
+                        this.speedX = (Math.random() - 0.5) * 0.3;
+                        this.opacity = Math.random() * 0.6 + 0.2;
+                        this.fadeSpeed = Math.random() * 0.0025 + 0.0008;
+                        this.maxY = canvasH + 15;
+                        this.colorT = Math.random();
+                        this.wobbleAmp = Math.random() * 0.4 + 0.1;
+                        this.wobbleSpeed = Math.random() * 0.015 + 0.005;
+                        this.wobbleOffset = Math.random() * Math.PI * 2;
+                        this.glowRadius = this.baseSize * 3.5;
+                    }
+                    update(dt, mx, my) {
+                        this.y += this.speedY * particleSpeedMultiplier;
+                        this.x += this.speedX * particleSpeedMultiplier + Math.sin(this.y * this.wobbleSpeed + this
+                            .wobbleOffset) * this.wobbleAmp;
+                        if (mx > -100 && my > -100) {
+                            const dx = this.x - mx,
+                                dy = this.y - my,
+                                dist = Math.sqrt(dx * dx + dy * dy),
+                                influenceRadius = mouseInfluenceRadius;
+                            if (dist < influenceRadius && dist > 0) { const force = (1 - dist / influenceRadius) * 1.6,
+                                    nx = dx / dist,
+                                    ny = dy / dist,
+                                    sign = dist < 50 ? 1 : -0.35;
+                                this.x += nx * force * sign;
+                                this.y += ny * force * sign;
+                                this.opacity = Math.min(0.85, this.opacity + 0.015);
+                                this.size = Math.min(this.baseSize * 2.2, this.size + 0.08); }
+                        }
+                        this.opacity -= this.fadeSpeed;
+                        this.size += (this.baseSize - this.size) * 0.06;
+                        this.colorT += 0.0003;
+                        if (this.colorT > 1) this.colorT -= 1;
+                        if (this.y > this.maxY || this.opacity <= 0.03) this.reset();
+                    }
+                    draw(ctx) {
+                        if (this.opacity <= 0.03) return;
+                        const color = getColor(this.colorT),
+                            alpha = Math.max(0, this.opacity),
+                            glowAlpha = alpha * 0.35;
+                        const glowGrad = ctx.createRadialGradient(this.x, this.y, this.size * 0.3, this.x, this.y, this
+                            .glowRadius);
+                        glowGrad.addColorStop(0, `rgba(${color.r},${color.g},${color.b},${glowAlpha})`);
+                        glowGrad.addColorStop(1, 'rgba(0,0,0,0)');
+                        ctx.fillStyle = glowGrad;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.glowRadius, 0, Math.PI * 2);
+                        ctx.fill();
+                        const coreGrad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                        coreGrad.addColorStop(0, `rgba(255,255,255,${Math.min(1,alpha*1.4)})`);
+                        coreGrad.addColorStop(0.5, `rgba(${color.r},${color.g},${color.b},${alpha})`);
+                        coreGrad.addColorStop(1, 'rgba(0,0,0,0)');
+                        ctx.fillStyle = coreGrad;
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+
+                function rebuildParticles() {
+                    const isMobile = window.innerWidth < 768;
+                    const baseCount = isMobile ? 28 : 48;
+                    const targetCount = Math.round(baseCount * particleDensityMultiplier);
+                    while (particles.length < targetCount) particles.push(new Particle());
+                    while (particles.length > targetCount && particles.length > 5) particles.pop();
+                }
+                rebuildParticles();
+                let lastTime = performance.now(),
+                    scanlineOffset = 0,
+                    glitchTimer = 0,
+                    glitchRows = [];
+                let lastRebuildCheck = 0;
+
+                function animate(timestamp) {
+                    const dt = Math.min(32, timestamp - lastTime);
+                    lastTime = timestamp;
+                    ctx.clearRect(0, 0, canvasW, canvasH);
+                    if (timestamp - lastRebuildCheck > 1500) { rebuildParticles();
+                        lastRebuildCheck = timestamp; }
+                    particles.forEach(p => { p.update(dt, mouseX, mouseY);
+                        p.draw(ctx); });
+                    if (scanlinesEnabled) {
+                        scanlineOffset += 0.4 * faultIntensity;
+                        if (scanlineOffset > 4) scanlineOffset = 0;
+                        glitchTimer += dt;
+                        if (glitchTimer > 1800 + Math.random() * 3000) { glitchTimer = 0;
+                            glitchRows = []; const numGlitches = Math.floor(Math.random() * 4 * faultIntensity) + 1;
+                            for (let i = 0; i < numGlitches; i++) glitchRows.push({ y: Math.random() * canvasH,
+                                    height: Math.random() * 3 * faultIntensity + 1, offset: (Math.random() - 0.5) *
+                                    12 * faultIntensity, alpha: Math.random() * 0.18 * faultIntensity + 0.04,
+                                life: 1 }); }
+                        ctx.fillStyle = 'rgba(255,255,255,0.015)';
+                        for (let y = scanlineOffset; y < canvasH; y += 4) ctx.fillRect(0, y, canvasW, 0.5);
+                        glitchRows = glitchRows.filter(g => { g.life -= 0.04; if (g.life <= 0) return false;
+                            ctx.fillStyle =
+                                `rgba(${Math.random()>0.5?'100,150,255':'180,100,240'},${g.alpha*g.life})`;
+                            ctx.fillRect(g.offset, g.y, canvasW, g.height);
+                            ctx.fillStyle = `rgba(255,255,255,${g.alpha*g.life*0.3})`;
+                            ctx.fillRect(g.offset + (Math.random() - 0.5) * 20 * faultIntensity, g.y + 1, canvasW *
+                                0.3, g.height * 0.6); return true; });
+                    }
+                    requestAnimationFrame(animate);
+                }
+                requestAnimationFrame(animate);
+            }
+
+            // ===== 游戏矩阵 =====
+            let currentMpIdx = 0,
+                mpRunning = false,
+                mpAnimationId = null,
+                mpIntervalId = null;
+            const mpNames = ["量子弹球", "数字华容道", "流光画板", "开心消消乐", "经典贪吃蛇", "2048内核", "霓虹俄罗斯方块", "像素小鸟飞飞", "赛博打砖块"];
+            const allCanvasIds = ['mpPinball', 'mpSlidell', 'mpSketch', 'mpMatch3', 'mpSnake', 'mpMatrix2048', 'mpTetris',
+                'mpFlappy', 'mpBreakout'
+            ];
+            const BEST_KEYS = ['best_pinball', null, null, null, 'best_snake', null, 'best_tetris', 'best_flappy',
+                'best_breakout'
+            ];
+
+            function cleanupAll() {
+                if (mpAnimationId) cancelAnimationFrame(mpAnimationId);
+                if (mpIntervalId) clearInterval(mpIntervalId);
+                mpAnimationId = null;
+                mpIntervalId = null;
+                const wrap = document.getElementById('mpWrapper');
+                if (wrap) { wrap.ontouchstart = null;
+                    wrap.ontouchend = null;
+                    wrap.ontouchmove = null; }
+                allCanvasIds.forEach(id => { const c = document.getElementById(id); if (c) { c.onmousemove = null;
+                        c.onmousedown = null;
+                        c.onmouseup = null;
+                        c.onmouseleave = null;
+                        c.onclick = null;
+                        c.ontouchstart = null;
+                        c.ontouchend = null;
+                        c.ontouchmove = null;
+                        c.onkeydown = null; } });
+                // 清理vpad按钮事件
+                const vpadBtns = document.querySelectorAll('#vpad .vpad-btn');
+                vpadBtns.forEach(b => { b.onclick = null;
+                    b.ontouchstart = null; });
+            }
+            window.switchMiniProgram = function(idx) {
+                currentMpIdx = idx;
+                mpRunning = false;
+                cleanupAll();
+                document.querySelectorAll('.mp-tab-item').forEach((t, i) => t.classList.toggle('active', i === idx));
+                allCanvasIds.forEach((cid, i) => document.getElementById(cid).classList.toggle('active-view', i === idx));
+                document.getElementById('mpGestureHint').style.display = (idx === 5 || idx === 6 || idx === 7) ? 'block' :
+                    'none';
+                document.getElementById('mpMask').style.display = 'flex';
+                document.getElementById('mpMaskDesc').innerText = `项目：${mpNames[idx]}已就绪`;
+                allCanvasIds.forEach(id => { const c = document.getElementById(id); if (c) { const cx = c.getContext('2d');
+                        cx.fillStyle = '#000';
+                        cx.fillRect(0, 0, c.width, c.height); } });
+                // 虚拟键盘显隐：仅游戏4(贪吃蛇)和游戏6(俄罗斯方块)显示
+                const vpad = document.getElementById('vpad');
+                if (vpad) {
+                    vpad.style.display = (idx === 4 || idx === 6) ? 'flex' : 'none';
+                }
+            };
+            window.bootMiniApp = function() {
+                document.getElementById('mpMask').style.display = 'none';
+                mpRunning = true;
+                cleanupAll();
+                if (currentMpIdx === 0) startPinballGame();
+                if (currentMpIdx === 1) startSlidellGame();
+                if (currentMpIdx === 2) startSketchGame();
+                if (currentMpIdx === 3) startMatch3Game();
+                if (currentMpIdx === 4) startSnakeGame();
+                if (currentMpIdx === 5) start2048Game();
+                if (currentMpIdx === 6) startTetrisGame();
+                if (currentMpIdx === 7) startFlappyGame();
+                if (currentMpIdx === 8) startBreakoutGame();
+            };
+
+            function roundRect(ctx, x, y, w, h, r) {
+                if (typeof ctx.roundRect === 'function') { ctx.beginPath();
+                    ctx.roundRect(x, y, w, h, r); } else { ctx.beginPath();
+                    ctx.moveTo(x + r, y);
+                    ctx.lineTo(x + w - r, y);
+                    ctx.arcTo(x + w, y, x + w, y + r, r);
+                    ctx.lineTo(x + w, y + h - r);
+                    ctx.arcTo(x + w, y + h, x + w - r, y + h, r);
+                    ctx.lineTo(x + r, y + h);
+                    ctx.arcTo(x, y + h, x, y + h - r, r);
+                    ctx.lineTo(x, y + r);
+                    ctx.arcTo(x, y, x + r, y, r); }
+            }
+
+            function diffMul(easyVal, normalVal, hardVal) {
+                if (globalDifficulty <= 1) return easyVal;
+                if (globalDifficulty >= 3) return hardVal;
+                return normalVal;
+            }
+
+            function initCanvasDPR(canvasId) {
+                const canvas = document.getElementById(canvasId);
+                const dpr = window.devicePixelRatio || 1;
+                const logicalW = 340,
+                    logicalH = 340;
+                canvas.width = logicalW * dpr;
+                canvas.height = logicalH * dpr;
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+                const ctx = canvas.getContext('2d');
+                ctx.scale(dpr, dpr);
+                return { canvas, ctx, W: logicalW, H: logicalH, dpr };
+            }
+
+            // 1️⃣ 量子弹球
+            function startPinballGame() {
+                const { canvas, ctx, W, H } = initCanvasDPR('mpPinball');
+                let ball = { x: W / 2, y: 80, vx: 3.8, vy: 4.0, radius: 7 };
+                let paddle = { x: W / 2 - 40, width: diffMul(90, 70, 55), height: 8, y: H - 18 };
+                let score = 0,
+                    trailParticles = [];
+
+                function getPaddleX(e) { const rect = canvas.getBoundingClientRect(),
+                        cx = e.clientX || (e.touches && e.touches[0].clientX) || paddle.x + paddle.width / 2; return Math
+                        .max(0, Math.min(W - paddle.width, cx - rect.left - paddle.width / 2)); }
+                canvas.onmousemove = (e) => { paddle.x = getPaddleX(e); };
+                canvas.ontouchmove = (e) => { e.preventDefault();
+                    paddle.x = getPaddleX(e); };
+
+                function spawnBurst(x, y, count, color) { for (let i = 0; i < count; i++) { const angle = Math.random() *
+                            Math.PI * 2,
+                            speed = Math.random() * 5 + 2;
+                        trailParticles.push({ x, y, vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, life: 1,
+                            size: Math.random() * 3.5 + 1, color: color || '10,132,255' }); } }
+
+                function update() {
+                    if (!mpRunning || currentMpIdx !== 0) { mpAnimationId = null; return; }
+                    ball.x += ball.vx;
+                    ball.y += ball.vy;
+                    if (ball.x < ball.radius || ball.x > W - ball.radius) { ball.vx *= -1;
+                        ball.x = Math.max(ball.radius, Math.min(W - ball.radius, ball.x)); }
+                    if (ball.y < ball.radius) { ball.vy = Math.abs(ball.vy);
+                        ball.y = ball.radius; }
+                    const padTop = paddle.y,
+                        padBottom = paddle.y + paddle.height;
+                    if (ball.y + ball.radius > padTop && ball.y - ball.radius < padBottom && ball.x > paddle.x - ball
+                        .radius && ball.x < paddle.x + paddle.width + ball.radius) { if (ball.vy > 0) { ball.vy = -Math
+                                .abs(ball.vy) * 1.04;
+                            const hitPos = (ball.x - paddle.x) / paddle.width;
+                            ball.vx += (hitPos - 0.5) * 4; const maxV = 7,
+                                spd = Math.sqrt(ball.vx * ball.vx + ball.vy * ball.vy); if (spd > maxV) { ball.vx *=
+                                    maxV / spd;
+                                ball.vy *= maxV / spd; }
+                            ball.y = padTop - ball.radius;
+                            score++;
+                            spawnBurst(ball.x, ball.y, 10, '48,209,88'); } }
+                    if (ball.y > H + 30) {
+                        updateBestScore('best_pinball', score);
+                        ball.x = W / 2;
+                        ball.y = 80;
+                        ball.vx = (Math.random() - 0.5) * 6;
+                        ball.vy = 3.5 + Math.random() * 2;
+                        score = 0;
+                        trailParticles = [];
+                        spawnBurst(W / 2, H - 30, 15, '255,69,58');
+                    }
+                    trailParticles = trailParticles.filter(p => { p.x += p.vx;
+                        p.y += p.vy;
+                        p.vy += 0.06;
+                        p.life -= 0.035; return p.life > 0; });
+                    ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, W, H);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.025)';
+                    ctx.lineWidth = 0.5; for (let i = 0; i < W; i += 30) { ctx.beginPath();
+                        ctx.moveTo(i, 0);
+                        ctx.lineTo(i, H);
+                        ctx.stroke(); } for (let i = 0; i < H; i += 30) { ctx.beginPath();
+                        ctx.moveTo(0, i);
+                        ctx.lineTo(W, i);
+                        ctx.stroke(); }
+                    trailParticles.forEach(p => { ctx.fillStyle = `rgba(${p.color},${p.life*0.8})`;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill(); });
+                    const glowGrad = ctx.createRadialGradient(ball.x, ball.y, ball.radius * 0.2, ball.x, ball.y, ball
+                        .radius * 3);
+                    glowGrad.addColorStop(0, 'rgba(10,132,255,0.6)');
+                    glowGrad.addColorStop(0.5, 'rgba(10,132,255,0.15)');
+                    glowGrad.addColorStop(1, 'rgba(10,132,255,0)');
+                    ctx.fillStyle = glowGrad;
+                    ctx.beginPath();
+                    ctx.arc(ball.x, ball.y, ball.radius * 3, 0, Math.PI * 2);
+                    ctx.fill();
+                    const ballGrad = ctx.createRadialGradient(ball.x - 1, ball.y - 1, 0.5, ball.x, ball.y, ball.radius);
+                    ballGrad.addColorStop(0, '#ffffff');
+                    ballGrad.addColorStop(0.35, '#5eb8ff');
+                    ballGrad.addColorStop(0.7, '#0a84ff');
+                    ballGrad.addColorStop(1, '#003d80');
+                    ctx.fillStyle = ballGrad;
+                    ctx.beginPath();
+                    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    const padGlow = ctx.createLinearGradient(paddle.x, padTop - 6, paddle.x, padBottom + 6);
+                    padGlow.addColorStop(0, 'rgba(255,255,255,0.15)');
+                    padGlow.addColorStop(1, 'rgba(255,255,255,0)');
+                    ctx.fillStyle = padGlow;
+                    roundRect(ctx, paddle.x - 4, padTop - 4, paddle.width + 8, paddle.height + 10, 6);
+                    ctx.fill();
+                    const padGrad = ctx.createLinearGradient(paddle.x, padTop, paddle.x, padBottom);
+                    padGrad.addColorStop(0, '#ffffff');
+                    padGrad.addColorStop(0.5, '#c0c0c6');
+                    padGrad.addColorStop(1, '#8e8e93');
+                    ctx.fillStyle = padGrad;
+                    roundRect(ctx, paddle.x, padTop, paddle.width, paddle.height, 4);
+                    ctx.fill();
+                    // 分数 + 最高分
+                    const bestPinball = getBestScore('best_pinball');
+                    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                    ctx.font = '600 16px -apple-system, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('当前:' + score + '  最高:' + bestPinball, W / 2, 45);
+                    mpAnimationId = requestAnimationFrame(update);
+                }
+                update();
+            }
+            // 2️⃣ 数字华容道
+            function startSlidellGame() {
+                const { canvas, ctx, W, H } = initCanvasDPR('mpSlidell');
+                const size = 3,
+                    tileSize = W / size;
+                let board = [1, 2, 3, 4, 5, 6, 7, 0, 8];
+
+                function draw() { ctx.fillStyle = '#0a0a0a';
+                    ctx.fillRect(0, 0, W, H);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+                    ctx.lineWidth = 0.8; for (let i = 1; i < size; i++) { ctx.beginPath();
+                        ctx.moveTo(i * tileSize, 0);
+                        ctx.lineTo(i * tileSize, H);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(0, i * tileSize);
+                        ctx.lineTo(W, i * tileSize);
+                        ctx.stroke(); } for (let i = 0; i < 9; i++) { const val = board[i]; if (val === 0)
+                        continue; const r = Math.floor(i / size),
+                            c = i % size,
+                            rx = c * tileSize + 4,
+                            ry = r * tileSize + 4,
+                            rw = tileSize - 8,
+                            rh = tileSize - 8; const tileGrad = ctx.createLinearGradient(rx, ry, rx, ry + rh);
+                        tileGrad.addColorStop(0, '#3a3a3c');
+                        tileGrad.addColorStop(1, '#1c1c1e');
+                        ctx.fillStyle = tileGrad;
+                        roundRect(ctx, rx, ry, rw, rh, 8);
+                        ctx.fill();
+                        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+                        ctx.lineWidth = 0.5;
+                        ctx.stroke();
+                        ctx.fillStyle = '#ffd60a';
+                        ctx.font = '700 24px -apple-system, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.shadowColor = 'rgba(255,214,10,0.5)';
+                        ctx.shadowBlur = 8;
+                        ctx.fillText(val, rx + rw / 2, ry + rh / 2);
+                        ctx.shadowBlur = 0; } }
+                canvas.onclick = (e) => { if (!mpRunning || currentMpIdx !== 1) return; const rect = canvas
+                        .getBoundingClientRect(),
+                        col = Math.floor((e.clientX - rect.left) / tileSize),
+                        row = Math.floor((e.clientY - rect.top) / tileSize); if (col < 0 || col >= size || row < 0 ||
+                        row >= size) return; const clicked = row * size + col,
+                        empty = board.indexOf(0),
+                        validMoves = []; if (empty % size !== 0) validMoves.push(empty - 1); if (empty % size !== size -
+                        1) validMoves.push(empty + 1); if (empty >= size) validMoves.push(empty - size); if (empty <
+                        size * (size - 1)) validMoves.push(empty + size); if (validMoves.includes(clicked)) { board[
+                            empty] = board[clicked];
+                        board[clicked] = 0;
+                        draw(); } };
+                draw();
+            }
+            // 3️⃣ 流光画板
+            function startSketchGame() {
+                const { canvas, ctx, W, H } = initCanvasDPR('mpSketch');
+                let painting = false,
+                    hue = 200;
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, W, H);
+                ctx.lineCap = 'round';
+                ctx.lineWidth = 7;
+                ctx.shadowBlur = 10;
+
+                function getPos(e) { const rect = canvas.getBoundingClientRect(),
+                        cx = e.clientX || (e.touches && e.touches[0].clientX),
+                        cy = e.clientY || (e.touches && e.touches[0].clientY); return { x: cx - rect.left, y: cy - rect
+                            .top }; }
+
+                function draw(e) { if (!painting || !mpRunning || currentMpIdx !== 2) return; const pos = getPos(e); if (
+                        pos.x < 0 || pos.y < 0 || pos.x > W || pos.y > H) return;
+                    ctx.strokeStyle = `hsl(${hue},100%,60%)`;
+                    ctx.shadowColor = `hsl(${hue},100%,60%)`;
+                    ctx.lineTo(pos.x, pos.y);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(pos.x, pos.y);
+                    hue = (hue + 5) % 360; }
+                canvas.onmousedown = (e) => { painting = true;
+                    draw(e); };
+                canvas.onmouseup = () => { painting = false;
+                    ctx.beginPath(); };
+                canvas.onmouseleave = () => { painting = false;
+                    ctx.beginPath(); };
+                canvas.onmousemove = draw;
+                canvas.ontouchstart = (e) => { e.preventDefault();
+                    painting = true;
+                    draw(e); };
+                canvas.ontouchend = () => { painting = false;
+                    ctx.beginPath(); };
+                canvas.ontouchmove = (e) => { e.preventDefault();
+                    draw(e); };
+            }
+            // 4️⃣ 开心消消乐
+            function startMatch3Game() {
+                const { canvas, ctx, W, H } = initCanvasDPR('mpMatch3');
+                const grid = 6,
+                    tSize = W / grid;
+                const colors = ['#ff3b30', '#0a84ff', '#30d158', '#ffd60a', '#bf5af2'];
+                let board = Array.from({ length: grid * grid }, () => colors[Math.floor(Math.random() * colors.length)]);
+                let elimAnimations = [];
+
+                function draw() { ctx.fillStyle = '#0a0a0a';
+                    ctx.fillRect(0, 0, W, H);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.03)';
+                    ctx.lineWidth = 0.5; for (let i = 1; i < grid; i++) { ctx.beginPath();
+                        ctx.moveTo(i * tSize, 0);
+                        ctx.lineTo(i * tSize, H);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(0, i * tSize);
+                        ctx.lineTo(W, i * tSize);
+                        ctx.stroke(); } for (let i = 0; i < board.length; i++) { if (!board[i]) continue; const r = Math
+                            .floor(i / grid),
+                            c = i % grid,
+                            cx = c * tSize + tSize / 2,
+                            cy = r * tSize + tSize / 2,
+                            radius = tSize / 2.4; const glowGrad = ctx.createRadialGradient(cx, cy, radius * 0.3, cx, cy,
+                                radius * 1.5);
+                        glowGrad.addColorStop(0, board[i]);
+                        glowGrad.addColorStop(1, 'transparent');
+                        ctx.fillStyle = glowGrad;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, radius * 1.5, 0, Math.PI * 2);
+                        ctx.fill(); const ballGrad = ctx.createRadialGradient(cx - 2, cy - 2, radius * 0.05, cx, cy,
+                            radius);
+                        ballGrad.addColorStop(0, '#ffffff');
+                        ballGrad.addColorStop(0.35, board[i]);
+                        ballGrad.addColorStop(1, 'rgba(0,0,0,0.5)');
+                        ctx.fillStyle = ballGrad;
+                        ctx.beginPath();
+                        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+                        ctx.fill(); }
+                    elimAnimations = elimAnimations.filter(ea => { ea.particles = ea.particles.filter(p => { p.x += p
+                                .vx;
+                            p.y += p.vy;
+                            p.vy += 0.05;
+                            p.life -= 0.028; return p.life > 0; });
+                        ea.particles.forEach(p => { ctx.fillStyle = `rgba(255,255,255,${p.life})`;
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                            ctx.fill(); }); return ea.particles.length > 0; }); }
+
+                function triggerElimEffect(indices) { const particles = [];
+                    indices.forEach(i => { const r = Math.floor(i / grid),
+                            c = i % grid,
+                            cx = c * tSize + tSize / 2,
+                            cy = r * tSize + tSize / 2; for (let j = 0; j < 12; j++) particles.push({ x: cx, y: cy,
+                            vx: (Math.random() - 0.5) * 6, vy: (Math.random() - 0.5) * 6 - 3, life: 1, size: Math
+                                .random() * 3.5 + 1.5 }); });
+                    elimAnimations.push({ particles }); }
+                canvas.onclick = (e) => { if (!mpRunning || currentMpIdx !== 3) return; const rect = canvas
+                        .getBoundingClientRect(),
+                        c = Math.floor((e.clientX - rect.left) / tSize),
+                        r = Math.floor((e.clientY - rect.top) / tSize); if (c < 0 || c >= grid || r < 0 || r >= grid)
+                        return; const idx = r * grid + c,
+                        targetColor = board[idx]; if (!targetColor) return; const matches = [idx],
+                        neighbors = []; if (c > 0) neighbors.push(idx - 1); if (c < grid - 1) neighbors.push(idx + 1); if (
+                        r > 0) neighbors.push(idx - grid); if (r < grid - 1) neighbors.push(idx + grid);
+                    neighbors.forEach(n => { if (board[n] === targetColor) matches.push(n); }); if (matches.length >
+                        1) { triggerElimEffect(matches);
+                        matches.forEach(i => board[i] = colors[Math.floor(Math.random() * colors.length)]);
+                        draw(); } };
+
+                function loopDraw() { if (!mpRunning || currentMpIdx !== 3) { mpAnimationId = null; return; }
+                    draw();
+                    mpAnimationId = requestAnimationFrame(loopDraw); }
+                loopDraw();
+            }
+            // 5️⃣ 经典贪吃蛇
+            function startSnakeGame() {
+                const { canvas, ctx, W, H } = initCanvasDPR('mpSnake');
+                const cSize = 20,
+                    len = Math.floor(W / cSize);
+                let snake = [{ x: 8, y: 8 }, { x: 7, y: 8 }, { x: 6, y: 8 }],
+                    dx = 1,
+                    dy = 0,
+                    nextDx = 1,
+                    nextDy = 0,
+                    fd = { x: 13, y: 8 },
+                    gameScore = 0,
+                    gameOver = false;
+                const snakeSpeed = diffMul(150, 130, 100);
+
+                function placeFood() { const occupied = new Set(snake.map(s => s.x + ',' + s.y)),
+                        empties = []; for (let x = 0; x < len; x++) { for (let y = 0; y < len; y++) { if (!occupied
+                                .has(x + ',' + y)) empties.push({ x, y }); } } if (empties.length > 0) fd = empties[
+                        Math.floor(Math.random() * empties.length)]; }
+                canvas.onclick = (e) => { if (!mpRunning || currentMpIdx !== 4 || gameOver) { if (gameOver) { gameOver =
+                            false;
+                        snake = [{ x: 8, y: 8 }, { x: 7, y: 8 }, { x: 6, y: 8 }];
+                        dx = 1;
+                        dy = 0;
+                        nextDx = 1;
+                        nextDy = 0;
+                        gameScore = 0;
+                        placeFood(); } return; } const rect = canvas.getBoundingClientRect(),
+                        cx = e.clientX - rect.left,
+                        cy = e.clientY - rect.top,
+                        headCX = snake[0].x * cSize + cSize / 2,
+                        headCY = snake[0].y * cSize + cSize / 2,
+                        adx = cx - headCX,
+                        ady = cy - headCY; if (Math.abs(adx) > Math.abs(ady)) { if (adx > 0 && dx !== -1) { nextDx =
+                                1;
+                            nextDy = 0; } else if (adx < 0 && dx !== 1) { nextDx = -1;
+                            nextDy = 0; } } else { if (ady > 0 && dy !== -1) { nextDx = 0;
+                            nextDy = 1; } else if (ady < 0 && dy !== 1) { nextDx = 0;
+                            nextDy = -1; } } };
+
+                // 绑定vpad按钮
+                const vpadBtns = document.querySelectorAll('#vpad .vpad-btn');
+                vpadBtns.forEach(b => {
+                    b.onclick = function(e) { e.stopPropagation(); if (!mpRunning || currentMpIdx !== 4 || gameOver)
+                            return; const dir = this.getAttribute('data-dir'); if (dir === 'up' && dy !== 1) {
+                            nextDx = 0;
+                            nextDy = -1; } else if (dir === 'down' && dy !== -1) { nextDx = 0;
+                            nextDy = 1; } else if (dir === 'left' && dx !== 1) { nextDx = -1;
+                            nextDy = 0; } else if (dir === 'right' && dx !== -1) { nextDx = 1;
+                            nextDy = 0; } };
+                    b.ontouchstart = function(e) { e.preventDefault();
+                        e.stopPropagation();
+                        b.onclick(e); };
+                });
+
+                function gameStep() { if (!mpRunning || currentMpIdx !== 4) return; if (gameOver) { drawSnake(); return; }
+                    dx = nextDx;
+                    dy = nextDy; const head = { x: snake[0].x + dx, y: snake[0].y + dy }; if (head.x < 0) head.x = len -
+                        1; if (head.x >= len) head.x = 0; if (head.y < 0) head.y = len - 1; if (head.y >= len) head.y =
+                        0; if (snake.some(s => s.x === head.x && s.y === head.y)) { gameOver = true;
+                        updateBestScore('best_snake', gameScore);
+                        drawSnake(); return; }
+                    snake.unshift(head); if (head.x === fd.x && head.y === fd.y) { gameScore++;
+                        placeFood(); } else { snake.pop(); }
+                    drawSnake(); }
+
+                function drawSnake() { ctx.fillStyle = '#000';
+                    ctx.fillRect(0, 0, W, H);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.025)';
+                    ctx.lineWidth = 0.4; for (let i = 0; i <= len; i++) { ctx.beginPath();
+                        ctx.moveTo(i * cSize, 0);
+                        ctx.lineTo(i * cSize, H);
+                        ctx.stroke();
+                        ctx.beginPath();
+                        ctx.moveTo(0, i * cSize);
+                        ctx.lineTo(W, i * cSize);
+                        ctx.stroke(); } if (!gameOver) { const foodGlow = ctx.createRadialGradient(fd.x * cSize + cSize / 2,
+                                fd.y * cSize + cSize / 2, cSize * 0.1, fd.x * cSize + cSize / 2, fd.y * cSize + cSize /
+                                2, cSize * 1.3);
+                        foodGlow.addColorStop(0, 'rgba(255,69,58,0.7)');
+                        foodGlow.addColorStop(1, 'rgba(255,69,58,0)');
+                        ctx.fillStyle = foodGlow;
+                        ctx.beginPath();
+                        ctx.arc(fd.x * cSize + cSize / 2, fd.y * cSize + cSize / 2, cSize * 1.3, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#ff453a';
+                        roundRect(ctx, fd.x * cSize + 2, fd.y * cSize + 2, cSize - 4, cSize - 4, 4);
+                        ctx.fill(); }
+                    snake.forEach((s, idx) => { const alpha = 1 - idx / (snake.length + 10),
+                            g = Math.round(180 + 75 * alpha);
+                        ctx.fillStyle = `rgba(30,${g},80,${Math.max(0.35,alpha)})`;
+                        roundRect(ctx, s.x * cSize + 1, s.y * cSize + 1, cSize - 2, cSize - 2, 5);
+                        ctx.fill(); }); if (snake.length > 0 && !gameOver) { ctx.fillStyle = '#fff';
+                        roundRect(ctx, snake[0].x * cSize + 4, snake[0].y * cSize + 4, cSize - 8, cSize - 8, 4);
+                        ctx.fill(); } if (!gameOver) { const bestSnake = getBestScore('best_snake');
+                        ctx.fillStyle = 'rgba(255,255,255,0.25)';
+                        ctx.font = '600 13px -apple-system, sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('当前:' + gameScore + '  最高:' + bestSnake, W / 2, 28); } if (gameOver) {
+                        drawGameOverCard(ctx, W, H, '经典贪吃蛇', gameScore, 'best_snake'); } }
+                mpIntervalId = setInterval(gameStep, snakeSpeed);
+                drawSnake();
+            }
+            // 6️⃣ 2048内核
+            function start2048Game() {
+                const { canvas, ctx, W, H } = initCanvasDPR('mpMatrix2048');
+                const size = 4,
+                    w = W / size;
+                let grid = [0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 4, 0, 0, 0],
+                    tsX, tsY;
+                const wrap = document.getElementById('mpWrapper');
+
+                function draw() { ctx.fillStyle = '#0a0a0a';
+                    ctx.fillRect(0, 0, W, H); for (let i = 0; i < 16; i++) { const r = Math.floor(i / size),
+                            c = i % size,
+                            rx = c * w + 3,
+                            ry = r * w + 3,
+                            rw = w - 6,
+                            rh = w - 6;
+                        ctx.fillStyle = '#1c1c1e';
+                        roundRect(ctx, rx, ry, rw, rh, 8);
+                        ctx.fill(); const val = grid[i]; if (val) { const cx = rx + rw / 2,
+                                cy = ry + rh / 2,
+                                isHigh = val >= 128; const glowGrad = ctx.createRadialGradient(cx, cy, w * 0.1, cx, cy,
+                                    w * 0.55);
+                            glowGrad.addColorStop(0, isHigh ? 'rgba(255,214,10,0.5)' : 'rgba(10,132,255,0.5)');
+                            glowGrad.addColorStop(1, 'transparent');
+                            ctx.fillStyle = glowGrad;
+                            ctx.beginPath();
+                            ctx.arc(cx, cy, w * 0.55, 0, Math.PI * 2);
+                            ctx.fill(); const tileGrad = ctx.createLinearGradient(rx, ry, rx, ry + rh);
+                            tileGrad.addColorStop(0, isHigh ? '#5c4800' : '#003366');
+                            tileGrad.addColorStop(1, isHigh ? '#3d3000' : '#001a33');
+                            ctx.fillStyle = tileGrad;
+                            roundRect(ctx, rx + 1, ry + 1, rw - 2, rh - 2, 8);
+                            ctx.fill();
+                            ctx.strokeStyle = isHigh ? 'rgba(255,214,10,0.3)' : 'rgba(10,132,255,0.3)';
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                            ctx.fillStyle = isHigh ? '#ffd60a' : '#0a84ff'; const fontSize = val > 512 ? 16 : val >
+                                64 ? 18 : 20;
+                            ctx.font = `700 ${fontSize}px -apple-system, sans-serif`;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.shadowColor = isHigh ? 'rgba(255,214,10,0.6)' : 'rgba(10,132,255,0.6)';
+                            ctx.shadowBlur = 6;
+                            ctx.fillText(val, cx, cy);
+                            ctx.shadowBlur = 0; } } }
+
+                function addRandomTile() { const empties = [];
+                    grid.forEach((v, i) => { if (!v) empties.push(i); }); if (empties.length) grid[empties[Math.floor(
+                        Math.random() * empties.length)]] = Math.random() > 0.25 ? 2 : 4; }
+
+                function slideRow(row) { let arr = row.filter(v => v); for (let i = 0; i < arr.length - 1; i++) { if (arr[
+                            i] && arr[i] === arr[i + 1]) { arr[i] *= 2;
+                        arr[i + 1] = 0; } }
+                    arr = arr.filter(v => v); while (arr.length < size) arr.push(0); return arr; }
+
+                function slideRowReverse(row) { let arr = row.filter(v => v); for (let i = arr.length - 1; i > 0; i--) { if (
+                        arr[i] && arr[i] === arr[i - 1]) { arr[i] *= 2;
+                        arr[i - 1] = 0; } }
+                    arr = arr.filter(v => v); while (arr.length < size) arr.unshift(0); return arr; }
+
+                function moveLeft() { let moved = false; for (let i = 0; i < 16; i += size) { const row = [grid[i], grid[i +
+                            1
+                        ], grid[i + 2], grid[i + 3]
+                    ],
+                        newRow = slideRow(row); if (row.join(',') !== newRow.join(',')) moved = true;
+                    grid[i] = newRow[0];
+                    grid[i + 1] = newRow[1];
+                    grid[i + 2] = newRow[2];
+                    grid[i + 3] = newRow[3]; } return moved; }
+
+                function moveRight() { let moved = false; for (let i = 0; i < 16; i += size) { const row = [grid[i], grid[
+                            i + 1], grid[i + 2], grid[i + 3]
+                    ],
+                        newRow = slideRowReverse(row); if (row.join(',') !== newRow.join(',')) moved = true;
+                    grid[i] = newRow[0];
+                    grid[i + 1] = newRow[1];
+                    grid[i + 2] = newRow[2];
+                    grid[i + 3] = newRow[3]; } return moved; }
+
+                function moveUp() { let moved = false; for (let c = 0; c < size; c++) { const col = [grid[c], grid[c + size],
+                        grid[c + size * 2], grid[c + size * 3]
+                    ],
+                        newCol = slideRow(col); if (col.join(',') !== newCol.join(',')) moved = true;
+                    grid[c] = newCol[0];
+                    grid[c + size] = newCol[1];
+                    grid[c + size * 2] = newCol[2];
+                    grid[c + size * 3] = newCol[3]; } return moved; }
+
+                function moveDown() { let moved = false; for (let c = 0; c < size; c++) { const col = [grid[c], grid[c +
+                        size], grid[c + size * 2], grid[c + size * 3]
+                    ],
+                        newCol = slideRowReverse(col); if (col.join(',') !== newCol.join(',')) moved = true;
+                    grid[c] = newCol[0];
+                    grid[c + size] = newCol[1];
+                    grid[c + size * 2] = newCol[2];
+                    grid[c + size * 3] = newCol[3]; } return moved; }
+
+                function handleSwipe(dx, dy) { let moved = false; if (Math.abs(dx) > Math.abs(dy)) { if (dx > 25) moved =
+                        moveRight(); else if (dx < -25) moved = moveLeft(); } else { if (dy > 25) moved = moveDown();
+                    else if (dy < -25) moved = moveUp(); } if (moved) { addRandomTile();
+                        draw(); } }
+                wrap.ontouchstart = (e) => { tsX = e.touches[0].clientX;
+                    tsY = e.touches[0].clientY; };
+                wrap.ontouchend = (e) => { if (!mpRunning || currentMpIdx !== 5) return;
+                    handleSwipe(e.changedTouches[0].clientX - tsX, e.changedTouches[0].clientY - tsY); };
+                draw();
+            }
+            // 7️⃣ 霓虹俄罗斯方块
+            function startTetrisGame() {
+                const { canvas, ctx, W, H } = initCanvasDPR('mpTetris');
+                const COLS = 10,
+                    ROWS = 20,
+                    BLOCK = Math.floor(W / COLS);
+                const board = Array(ROWS).fill().map(() => Array(COLS).fill(0));
+                const tetrominos = [{ shape: [
+                        [1, 1, 1, 1]
+                    ], color: '#0a84ff' }, { shape: [
+                        [1, 1],
+                        [1, 1]
+                    ], color: '#ffd60a' }, { shape: [
+                        [0, 1, 0],
+                        [1, 1, 1]
+                    ], color: '#bf5af2' }, { shape: [
+                        [1, 0, 0],
+                        [1, 1, 1]
+                    ], color: '#30d158' }, { shape: [
+                        [0, 0, 1],
+                        [1, 1, 1]
+                    ], color: '#ff453a' }, { shape: [
+                        [0, 1, 1],
+                        [1, 1, 0]
+                    ], color: '#ff9f0a' }, { shape: [
+                        [1, 1, 0],
+                        [0, 1, 1]
+                    ], color: '#64d2ff' }];
+                let currentPiece, nextPiece, posX, posY, score, gameOver, lastDrop, gameOverDrawn = false;
+                const dropSpeed = diffMul(800, 500, 350);
+
+                function spawnPiece() { if (!nextPiece) nextPiece = tetrominos[Math.floor(Math.random() * tetrominos
+                        .length)];
+                    currentPiece = nextPiece;
+                    nextPiece = tetrominos[Math.floor(Math.random() * tetrominos.length)];
+                    posX = Math.floor(COLS / 2) - Math.floor(currentPiece.shape[0].length / 2);
+                    posY = 0; if (collision()) gameOver = true; }
+
+                function collision() { for (let r = 0; r < currentPiece.shape.length; r++) { for (let c = 0; c <
+                        currentPiece.shape[r].length; c++) { if (currentPiece.shape[r][c]) { const newX = posX + c,
+                                newY = posY + r; if (newX < 0 || newX >= COLS || newY >= ROWS || (newY >= 0 &&
+                                board[newY][newX])) return true; } } } return false; }
+
+                function rotatePiece() { const rotated = currentPiece.shape[0].map((_, i) => currentPiece.shape.map(row =>
+                    row[i]).reverse()); const prevShape = currentPiece.shape;
+                    currentPiece.shape = rotated; if (collision()) currentPiece.shape = prevShape; }
+
+                function lockPiece() { for (let r = 0; r < currentPiece.shape.length; r++) { for (let c = 0; c <
+                        currentPiece.shape[r].length; c++) { if (currentPiece.shape[r][c]) { const boardY = posY + r,
+                                boardX = posX + c; if (boardY < 0) { gameOver = true; return; }
+                        board[boardY][boardX] = currentPiece.color; } } } let linesCleared = 0; for (let r = ROWS -
+                        1; r >= 0; r--) { if (board[r].every(cell => cell !== 0)) { board.splice(r, 1);
+                        board.unshift(Array(COLS).fill(0));
+                        linesCleared++;
+                        r++; } } if (linesCleared > 0) score += linesCleared * 100;
+                    spawnPiece(); }
+
+                function moveDownPiece() { posY++; if (collision()) { posY--;
+                        lockPiece(); } }
+
+                function draw() { ctx.fillStyle = '#0a0a0a';
+                    ctx.fillRect(0, 0, W, H); for (let r = 0; r < ROWS; r++) { for (let c = 0; c < COLS; c++) { if (
+                                board[r][c]) { ctx.fillStyle = board[r][c];
+                                ctx.fillRect(c * BLOCK, r * BLOCK, BLOCK - 1, BLOCK - 1);
+                                ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                                ctx.fillRect(c * BLOCK, r * BLOCK, BLOCK - 1, 3); } } } if (currentPiece && !
+                    gameOver) { for (let r = 0; r < currentPiece.shape.length; r++) { for (let c = 0; c < currentPiece
+                                .shape[r].length; c++) { if (currentPiece.shape[r][c]) { ctx.fillStyle = currentPiece
+                                    .color;
+                                ctx.fillRect((posX + c) * BLOCK, (posY + r) * BLOCK, BLOCK - 1, BLOCK - 1);
+                                ctx.fillStyle = 'rgba(255,255,255,0.3)';
+                                ctx.fillRect((posX + c) * BLOCK, (posY + r) * BLOCK, BLOCK - 1, 3); } } } } if (!
+                        gameOver) { const bestTetris = getBestScore('best_tetris');
+                        ctx.fillStyle = '#fff';
+                        ctx.font = 'bold 11px -apple-system';
+                        ctx.fillText('当前:' + score + '  最高:' + bestTetris, 8, 16); } if (gameOver) {
+                        updateBestScore('best_tetris', score);
+                        gameOverDrawn = true;
+                        drawGameOverCard(ctx, W, H, '霓虹俄罗斯方块', score, 'best_tetris'); } }
+
+                function gameLoop(ts) { if (!mpRunning || currentMpIdx !== 6) return; if (!gameOver) { if (ts - lastDrop >
+                        dropSpeed) { moveDownPiece();
+                        lastDrop = ts; }
+                    draw(); } else { if (!gameOverDrawn) { updateBestScore('best_tetris', score);
+                        gameOverDrawn = true; }
+                    draw(); }
+                    mpAnimationId = requestAnimationFrame(gameLoop); }
+                // 绑定vpad按钮
+                const vpadBtns = document.querySelectorAll('#vpad .vpad-btn');
+                vpadBtns.forEach(b => {
+                    b.onclick = function(e) { e.stopPropagation(); if (!mpRunning || currentMpIdx !== 6 || gameOver)
+                            return; const dir = this.getAttribute('data-dir'); if (dir === 'up') {
+                            rotatePiece(); } else if (dir === 'down') { moveDownPiece(); } else if (dir ===
+                            'left') { posX--; if (collision()) posX++; } else if (dir === 'right') { posX++; if (
+                                collision()) posX--; }
+                        draw(); };
+                    b.ontouchstart = function(e) { e.preventDefault();
+                        e.stopPropagation();
+                        b.onclick(e); };
+                });
+                canvas.tabIndex = 1;
+                canvas.onclick = (e) => { canvas.focus(); if (gameOver) { score = 0;
+                        gameOver = false;
+                        gameOverDrawn = false;
+                        board.forEach(row => row.fill(0));
+                        nextPiece = null;
+                        spawnPiece();
+                        lastDrop = performance.now();
+                        draw(); } else { const rect = canvas.getBoundingClientRect(),
+                            cx = e.clientX - rect.left; if (cx < W / 3) { posX--; if (collision()) posX++; } else if (
+                            cx > 2 * W / 3) { posX++; if (collision()) posX--; } else { rotatePiece(); }
+                    draw(); } };
+                canvas.onkeydown = (e) => { if (gameOver || !mpRunning) return; if (e.keyCode === 37) { posX--; if (
+                        collision()) posX++; } else if (e.keyCode === 39) { posX++; if (collision()) posX--; } else if (
+                        e.keyCode === 40) { moveDownPiece(); } else if (e.keyCode === 38) { rotatePiece(); }
+                    draw(); };
+                score = 0;
+                gameOver = false;
+                gameOverDrawn = false;
+                spawnPiece();
+                lastDrop = performance.now();
+                mpAnimationId = requestAnimationFrame(gameLoop);
+            }
+            // 8️⃣ 像素小鸟飞飞
+            function startFlappyGame() {
+                const { canvas, ctx, W, H } = initCanvasDPR('mpFlappy');
+                let bird = { x: 55, y: H / 2, vy: 0, r: 9 };
+                const gravity = diffMul(0.18, 0.25, 0.35);
+                const jumpForce = diffMul(-8.5, -7.5, -6);
+                let pipes = [],
+                    score = 0,
+                    gameOver = false,
+                    gameOverDrawn = false,
+                    pipeTimer = 0;
+                const pipeInterval = diffMul(180, 140, 100);
+                const pipeSpeed = diffMul(1.0, 1.4, 2.0);
+                const pipeGap = diffMul(170, 145, 115);
+
+                function spawnPipe() { const topH = Math.random() * (H - pipeGap - 70) + 35;
+                    pipes.push({ x: W, topH, bottomY: topH + pipeGap, passed: false }); }
+
+                function resetGame() { bird.y = H / 2;
+                    bird.vy = 0;
+                    pipes = [];
+                    score = 0;
+                    gameOver = false;
+                    gameOverDrawn = false;
+                    pipeTimer = 0; }
+
+                function update() { if (gameOver) return;
+                    bird.vy += gravity;
+                    bird.y += bird.vy; if (bird.y - bird.r < 0 || bird.y + bird.r > H) { gameOver = true;
+                        updateBestScore('best_flappy', score); return; }
+                    pipeTimer++; if (pipeTimer > pipeInterval) { spawnPipe();
+                        pipeTimer = 0; } for (let i = pipes.length - 1; i >= 0; i--) { pipes[i].x -= pipeSpeed; if (!
+                            pipes[i].passed && pipes[i].x + 35 < bird.x) { pipes[i].passed = true;
+                        score++; } if (pipes[i].x < -40) pipes.splice(i, 1); const px = pipes[i].x,
+                            pw = 40; if (bird.x + bird.r > px && bird.x - bird.r < px + pw) { if (bird.y - bird.r <
+                                pipes[i].topH || bird.y + bird.r > pipes[i].bottomY) { gameOver = true;
+                                updateBestScore('best_flappy', score); } } } }
+
+                function draw() { ctx.fillStyle = '#1a1a2e';
+                    ctx.fillRect(0, 0, W, H); if (!gameOver) {
+                        pipes.forEach(p => { const grad = ctx.createLinearGradient(p.x, 0, p.x + 40, 0);
+                            grad.addColorStop(0, '#30d158');
+                            grad.addColorStop(1, '#0a84ff');
+                            ctx.fillStyle = grad;
+                            roundRect(ctx, p.x, 0, 40, p.topH, 6);
+                            ctx.fill();
+                            roundRect(ctx, p.x, p.bottomY, 40, H - p.bottomY, 6);
+                            ctx.fill();
+                            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+                            roundRect(ctx, p.x + 5, 0, 10, p.topH, 4);
+                            ctx.fill();
+                            roundRect(ctx, p.x + 5, p.bottomY, 10, H - p.bottomY, 4);
+                            ctx.fill(); }); const birdGrad = ctx.createRadialGradient(bird.x - 2, bird.y - 2, 0, bird.x,
+                            bird.y, bird.r);
+                        birdGrad.addColorStop(0, '#ffd60a');
+                        birdGrad.addColorStop(1, '#ff9f0a');
+                        ctx.fillStyle = birdGrad;
+                        ctx.beginPath();
+                        ctx.arc(bird.x, bird.y, bird.r, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#fff';
+                        ctx.beginPath();
+                        ctx.arc(bird.x - 3, bird.y - 3, 3, 0, Math.PI * 2);
+                        ctx.fill();
+                        ctx.fillStyle = '#000';
+                        ctx.beginPath();
+                        ctx.arc(bird.x - 2, bird.y - 3, 1.5, 0, Math.PI * 2);
+                        ctx.fill(); const bestFlappy = getBestScore('best_flappy');
+                        ctx.fillStyle = '#fff';
+                        ctx.font = 'bold 13px -apple-system';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('当前:' + score + '  最高:' + bestFlappy, W / 2, 30); } if (gameOver) {
+                        gameOverDrawn = true;
+                        drawGameOverCard(ctx, W, H, '像素小鸟飞飞', score, 'best_flappy'); } }
+
+                function loop() { if (!mpRunning || currentMpIdx !== 7) return;
+                    update();
+                    draw();
+                    mpAnimationId = requestAnimationFrame(loop); }
+                canvas.onclick = () => { if (gameOver) { resetGame(); } else bird.vy = jumpForce; };
+                const wrap = document.getElementById('mpWrapper');
+                wrap.ontouchstart = (e) => { e.preventDefault(); if (gameOver) { resetGame(); } else bird.vy =
+                    jumpForce; };
+                resetGame();
+                mpAnimationId = requestAnimationFrame(loop);
+            }
+            // 9️⃣ 赛博打砖块
+            function startBreakoutGame() {
+                const { canvas, ctx, W, H } = initCanvasDPR('mpBreakout');
+                let paddle = { x: W / 2 - 50, y: H - 30, w: diffMul(100, 80, 65), h: 10 };
+                let ball = { x: W / 2, y: H - 60, vx: diffMul(2.5, 3.2, 4.5), vy: diffMul(-3, -3.5, -4.5), r: 6 };
+                let bricks = [],
+                    score = 0,
+                    gameOver = false,
+                    gameOverDrawn = false;
+                const rows = 5,
+                    cols = 7,
+                    bW = (W - 40) / cols,
+                    bH = 16;
+
+                function initBricks() { bricks = []; for (let r = 0; r < rows; r++) { for (let c = 0; c < cols; c++) { const
+                            hue = (r * 30 + c * 15) % 360;
+                        bricks.push({ x: 20 + c * bW, y: 40 + r * bH, w: bW - 4, h: bH - 4, alive: true, color: `hsl(${hue},100%,60%)` }); } } }
+
+                function resetBall() { ball.x = paddle.x + paddle.w / 2;
+                    ball.y = paddle.y - ball.r - 5;
+                    ball.vx = (Math.random() * 3 + 1.5) * (Math.random() > 0.5 ? 1 : -1);
+                    ball.vy = diffMul(-2.8, -3.5, -4.5); }
+
+                function update() { if (gameOver) return;
+                    ball.x += ball.vx;
+                    ball.y += ball.vy; if (ball.x - ball.r < 0 || ball.x + ball.r > W) ball.vx *= -1; if (ball.y - ball.r <
+                        0) ball.vy *= -1; if (ball.y + ball.r > H) { gameOver = true;
+                        updateBestScore('best_breakout', score); return; } if (ball.y + ball.r > paddle.y && ball.y -
+                        ball.r < paddle.y + paddle.h && ball.x > paddle.x && ball.x < paddle.x + paddle.w) { ball.vy = -
+                            Math.abs(ball.vy); const hitPos = (ball.x - paddle.x) / paddle.w;
+                        ball.vx += (hitPos - 0.5) * 5; const spd = Math.sqrt(ball.vx ** 2 + ball.vy ** 2),
+                            maxSpd = 6.5; if (spd > maxSpd) { ball.vx *= maxSpd / spd;
+                            ball.vy *= maxSpd / spd; }
+                        ball.y = paddle.y - ball.r; }
+                    bricks.forEach(b => { if (b.alive && ball.x + ball.r > b.x && ball.x - ball.r < b.x + b.w && ball
+                            .y + ball.r > b.y && ball.y - ball.r < b.y + b.h) { b.alive = false;
+                            score += 10; if (ball.x < b.x || ball.x > b.x + b.w) ball.vx *= -1; else ball.vy *= -1; } }); if (
+                        bricks.every(b => !b.alive)) initBricks(); }
+
+                function draw() { ctx.fillStyle = '#0a0a0a';
+                    ctx.fillRect(0, 0, W, H); if (!gameOver) {
+                        bricks.forEach(b => { if (!b.alive) return;
+                            ctx.fillStyle = b.color;
+                            roundRect(ctx, b.x, b.y, b.w, b.h, 4);
+                            ctx.fill();
+                            ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                            roundRect(ctx, b.x, b.y, b.w, 4, 4);
+                            ctx.fill(); }); const padGrad = ctx.createLinearGradient(paddle.x, paddle.y, paddle.x,
+                            paddle.y + paddle.h);
+                        padGrad.addColorStop(0, '#fff');
+                        padGrad.addColorStop(1, '#0a84ff');
+                        ctx.fillStyle = padGrad;
+                        roundRect(ctx, paddle.x, paddle.y, paddle.w, paddle.h, 6);
+                        ctx.fill(); const ballGrad = ctx.createRadialGradient(ball.x, ball.y, 0, ball.x, ball.y, ball
+                            .r);
+                        ballGrad.addColorStop(0, '#ffffff');
+                        ballGrad.addColorStop(0.6, '#ffd60a');
+                        ballGrad.addColorStop(1, '#ff453a');
+                        ctx.fillStyle = ballGrad;
+                        ctx.beginPath();
+                        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+                        ctx.fill(); const bestBreakout = getBestScore('best_breakout');
+                        ctx.fillStyle = '#fff';
+                        ctx.font = 'bold 11px -apple-system';
+                        ctx.fillText('当前:' + score + '  最高:' + bestBreakout, 10, 18); } if (gameOver) {
+                        gameOverDrawn = true;
+                        drawGameOverCard(ctx, W, H, '赛博打砖块', score, 'best_breakout'); } }
+
+                function loop() { if (!mpRunning || currentMpIdx !== 8) return;
+                    update();
+                    draw();
+                    mpAnimationId = requestAnimationFrame(loop); }
+                canvas.onmousemove = (e) => { const rect = canvas.getBoundingClientRect();
+                    paddle.x = Math.max(0, Math.min(W - paddle.w, e.clientX - rect.left - paddle.w / 2)); };
+                canvas.ontouchmove = (e) => { e.preventDefault(); const rect = canvas.getBoundingClientRect();
+                    paddle.x = Math.max(0, Math.min(W - paddle.w, e.touches[0].clientX - rect.left - paddle.w / 2)); };
+                canvas.onclick = () => { if (gameOver) { gameOver = false;
+                        gameOverDrawn = false;
+                        score = 0;
+                        initBricks();
+                        resetBall(); } };
+                initBricks();
+                resetBall();
+                mpAnimationId = requestAnimationFrame(loop);
+            }
+            document.addEventListener('contextmenu', e => e.preventDefault());
+        })();
+    </script>
+</body>
+</html>
